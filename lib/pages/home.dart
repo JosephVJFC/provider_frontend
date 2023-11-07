@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+// import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:mpm_frontend/constants/bnavigation.dart';
-import 'package:provider_frontend/model/user_detailprovider.dart';
-import 'package:provider/provider.dart';
-import '../model/user_detail_model.dart';
+// import 'package:provider_frontend/model/user_detailprovider.dart';
+// import 'package:provider/provider.dart';
+// import '../model/user_detail_model.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
 class Provider_Home extends StatefulWidget {
@@ -49,26 +48,26 @@ class _Provider_HomeState extends State<Provider_Home> {
     return 'Good Evening';
   }
 
-  void getuserDetails() {
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      Provider.of<UserDetailsProvider>(context, listen: false)
-          .setUserDetails(context);
-    });
-  }
+  // void getuserDetails() {
+  //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+  //     Provider.of<UserDetailsProvider>(context, listen: false)
+  //         .setUserDetails(context);
+  //   });
+  // }
 
   @override
-  void initState() {
-    getuserDetails();
-    super.initState();
-  }
+  // void initState() {
+  //   getuserDetails();
+  //   super.initState();
+  // }
 
   int selectedPageIndex = 0;
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    return Consumer<UserDetailsProvider>(builder: (context, value, child) {
-      User userdetails = value.userdetail;
+    // return Consumer<UserDetailsProvider>(builder: (context, value, child) {
+      // User userdetails = value.userdetail;
       return WillPopScope(
           onWillPop: _onWillPop,
           child: SafeArea(
@@ -93,7 +92,9 @@ class _Provider_HomeState extends State<Provider_Home> {
                               color: Colors.grey,
                             ),
                           ),
-                          Text(userdetails.name,
+                          Text(
+                            // userdetails.name,
+                            "hjkhjh",
                               style: GoogleFonts.commissioner(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w700,
@@ -405,6 +406,7 @@ class _Provider_HomeState extends State<Provider_Home> {
                   Icon(Icons.add,),
                 ]),
           )));
-    });
+    // }
+    // );
   }
 }

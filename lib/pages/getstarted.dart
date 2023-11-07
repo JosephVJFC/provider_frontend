@@ -23,7 +23,7 @@ class GetStarted extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
-                'assets/images/re', // Replace with the path to your SVG file
+                'lib/assets/images/get_started.svg', // Replace with the path to your SVG file
                 width: 300, // Set the width of the SVG
                 height: 300, // Set the height of the SVG
               ),
@@ -33,7 +33,7 @@ class GetStarted extends StatelessWidget {
                 style: GoogleFonts.commissioner(
                     fontSize: 20,
                     fontWeight: FontWeight.w700,
-                    color: Color.fromRGBO(157, 118, 193, 1)),
+                    color: const Color.fromRGBO(157, 118, 193, 1)),
               ),
               const SizedBox(height: 16),
 

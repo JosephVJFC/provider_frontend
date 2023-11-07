@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider_frontend/pages/getstarted.dart';
 import 'package:provider_frontend/pages/home.dart';
+import 'package:provider_frontend/pages/login.dart';
+import 'package:provider_frontend/pages/jp_register.dart';
 
 void main() {
   runApp(const MyApp());
@@ -34,8 +36,10 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      // home: const GetStarted(),
-      home: const Provider_Home()
+      home: const GetStarted(),
+      // home: const Login(),
+      // home: const JpRegister()
+      // home: const Provider_Home(),
     );
   }
 }
