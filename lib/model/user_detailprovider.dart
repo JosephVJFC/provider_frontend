@@ -11,7 +11,7 @@ User _user = User(
   mobileNumber: '',
   name: '',
   email: '',
-  JsId: '',
+  JpId: '',
   token: '',
 );
 

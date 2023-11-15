@@ -6,9 +6,6 @@ import 'package:provider_frontend/pages/login.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider_frontend/pages/home.dart';
 
-// import '../constants/bnavigation.dart';
-// import 'home.dart';
-
 class GetStarted extends StatelessWidget {
   // route to another page
   static String route = '/';
@@ -74,7 +71,7 @@ class GetStarted extends StatelessWidget {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => Provider_Home(),
+                        builder: (context) => Home(),
                       ),
                     );
                   } else {

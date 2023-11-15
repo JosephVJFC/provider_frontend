@@ -13,7 +13,9 @@ import 'package:provider_frontend/constants/globalvariable.dart';
 import 'package:provider_frontend/constants/utilities.dart';
 // import 'package:mpm_frontend/pages/otp_verification.dart';
 import 'package:provider_frontend/pages/otp_verification.dart';
+import '../constants/headers.dart';
 import '../model/user_detail_model.dart';
+import '../pages/getstarted.dart';
 
 class Jssignup {
   Future<void> signup({
@@ -23,7 +25,7 @@ class Jssignup {
     required context,
   }) async {
     // Define the URL of your API endpoint
-    final String apiUrl = '$JbaseUrl/api/signup';
+    final String apiUrl = '$JbaseUrl/api/jp/signup';
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.clear();
@@ -34,14 +36,18 @@ class Jssignup {
       'name': name,
     });
 
-    print(apiUrl);
-
+    print(apiUrl );
+    print( mobileNumber );
     Dio dio = Dio();
     Response response = await dio.post(
       apiUrl,
       data: formData,
-    );
+      options: Options(
+              headers:JsApplicationHeader,
+            ),
 
+
+    );
     if (response.statusCode == 200) {
       // Handle a successful response
 
@@ -51,7 +57,7 @@ class Jssignup {
         var message_two = message['user'];
         var mobileNumber = message_two['mobileNumber'];
         var email = message_two['email'];
-        var name = message_two['jsName'];
+        var name = message_two['userName'];
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString("mobileNumber", "$mobileNumber");
@@ -84,7 +90,7 @@ class Jsotpverify {
     required context,
   }) async {
     // Define the URL of your API endpoint
-    final String apiUrl = '$JbaseUrl/api/otpverify';
+    final String apiUrl = '$JbaseUrl/api/jp/otpverify';
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     mobileNumber = prefs.getString("mobileNumber");
@@ -98,11 +104,15 @@ class Jsotpverify {
     });
 
     print(apiUrl);
+    print( mobileNumber);
 
     Dio dio = Dio();
     Response response = await dio.post(
       apiUrl,
       data: formData,
+      options: Options(
+        headers:JsApplicationHeader,
+      ),
     );
 
     if (response.statusCode == 200) {
@@ -114,14 +124,14 @@ class Jsotpverify {
         var message_two = message['user'];
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        String user = message_two['jsId'];
-        String Jstoken = message_two['token'];
-        await prefs.setString("jsId", "$user");
-        await prefs.setString("Jstoken", "$Jstoken");
+        String user = message_two['jpId'];
+        String Jptoken = message_two['token'];
+        await prefs.setString("jpId", "$user");
+        await prefs.setString("Jptoken", "$Jptoken");
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const Provider_Home()
+            builder: (context) => const Home()
           ),
         );
       } else {
@@ -143,7 +153,7 @@ class Jssignin {
     required context,
   }) async {
     // Define the URL of your API endpoint
-    final String apiUrl = '$JbaseUrl/api/signin';
+    final String apiUrl = '$JbaseUrl/api/jp/signin';
 
     // Create a FormData object
 
@@ -157,6 +167,9 @@ class Jssignin {
     Response response = await dio.post(
       apiUrl,
       data: formData,
+      options: Options(
+        headers:JsApplicationHeader,
+      ),
     );
 
     if (response.statusCode == 200) {
@@ -167,9 +180,9 @@ class Jssignin {
         var message = response.data['response'];
         var message_two = message['user'];
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        var user = message_two['jsId'];
+        var user = message_two['userId'];
         var mobileNumber = message_two['mobileNumber'];
-        await prefs.setString("jsId", "$user");
+        await prefs.setString("jpId", "$user");
         await prefs.setString("mobileNumber", "$mobileNumber");
         Navigator.push(
           context,
@@ -209,12 +222,15 @@ class Jsresend {
         'name': name,
       });
       // Define the URL of your API endpoint
-      final String apiUrl = '$JbaseUrl/api/resendotp';
+      final String apiUrl = '$JbaseUrl/api/jp/resendotp';
       print(apiUrl);
       Dio dio = Dio();
       Response response = await dio.post(
         apiUrl,
         data: formData,
+        options: Options(
+          headers:JsApplicationHeader,
+        ),
       );
 
       if (response.statusCode == 200) {
@@ -226,8 +242,8 @@ class Jsresend {
           var message = response.data['response'];
           var message_two = message['user'];
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          var user = message_two['jsId'];
-          await prefs.setString("jsId", "$user");
+          var user = message_two['userId'];
+          await prefs.setString("userId", "$user");
         } else {
           showCustomSnackBar(
             context: context,
@@ -259,8 +275,8 @@ class Jsresend {
           var message = response.data['response'];
           var message_two = message['user'];
           SharedPreferences prefs = await SharedPreferences.getInstance();
-          var user = message_two['jsId'];
-          await prefs.setString("jsId", "$user");
+          var user = message_two['userId'];
+          await prefs.setString("userId", "$user");
         } else {
           showCustomSnackBar(
             context: context,
@@ -273,4 +289,64 @@ class Jsresend {
       }
     }
   }
+}
+
+class Jslogout{
+
+
+  Future<void> jslogout({
+
+    required String ? jpId,
+    required context,
+  }) async {
+
+    // Define the URL of your API endpoint
+    final String apiUrl = '$JbaseUrl/api/jp/logout';
+    // Create a FormData object
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String ? jpId = prefs.getString("jpId");
+    FormData formData = FormData.fromMap({
+      'jpId':jpId,
+    });
+    print(apiUrl);
+    Dio dio = Dio();
+    Response response = await dio.post(
+      apiUrl,
+      data: formData,
+      options: Options(
+        headers:JsApplicationHeader,
+      ),
+    );
+    if (response.statusCode == 200  ) {
+      // Handle a successful response
+      if(response.data['status']== "1") {
+        print('API response: ${response.data}');
+        String message=response.data['response'];
+
+        await prefs.clear();
+
+        showCustomSnackBar(
+          context: context,
+          text:message.toString(),
+        );
+
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const GetStarted(),
+          ),
+        );
+
+      }else{
+        showCustomSnackBar(
+          context: context,
+          text:response.data['response'].toString(),
+        );
+      }
+    } else {
+      // Handle errors here
+      print('API request failed with status code ${response.statusCode}');
+    }
+  }
+
 }

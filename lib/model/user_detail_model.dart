@@ -4,14 +4,14 @@ class User{
   String name;
   String mobileNumber;
   String token;
-  String JsId;
+  String JpId;
 
   User({
     required this.email,
     required this.name,
     required this.mobileNumber,
     required this.token,
-    required this.JsId,
+    required this.JpId,
 
   });
 

@@ -89,9 +89,25 @@ class Resend {
     };
   }
 
+
+
+
 }
 
+class Logout {
+  String? jpId;
 
+  Logout({
+    required this.jpId,
+    required context,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      'jpId': jpId,
+    };
+  }
+}
 
 
 

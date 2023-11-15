@@ -1,19 +1,20 @@
 import 'package:flutter/material.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
-// import 'package:provider_frontend/model/user_detailprovider.dart';
-// import 'package:provider/provider.dart';
-// import '../model/user_detail_model.dart';
+import 'package:provider_frontend/model/user_detailprovider.dart';
+import 'package:provider/provider.dart';
+import '../model/user_detail_model.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
-class Provider_Home extends StatefulWidget {
-  const Provider_Home({super.key});
+class Home extends StatefulWidget {
+  const Home({super.key});
+  static String route = '/home';
 
   @override
-  State<Provider_Home> createState() => _Provider_HomeState();
+  State<Home> createState() => _HomeState();
 }
 
-class _Provider_HomeState extends State<Provider_Home> {
+class _HomeState extends State<Home> {
   Future<bool> _onWillPop() async {
     return (await showDialog(
           context: context,
@@ -48,26 +49,26 @@ class _Provider_HomeState extends State<Provider_Home> {
     return 'Good Evening';
   }
 
-  // void getuserDetails() {
-  //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-  //     Provider.of<UserDetailsProvider>(context, listen: false)
-  //         .setUserDetails(context);
-  //   });
-  // }
+  void getuserDetails() {
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      Provider.of<UserDetailsProvider>(context, listen: false)
+          .setUserDetails(context);
+    });
+  }
 
   @override
-  // void initState() {
-  //   getuserDetails();
-  //   super.initState();
-  // }
+  void initState() {
+    getuserDetails();
+    super.initState();
+  }
 
   int selectedPageIndex = 0;
   @override
   Widget build(BuildContext context) {
     var height = MediaQuery.of(context).size.height;
     var width = MediaQuery.of(context).size.width;
-    // return Consumer<UserDetailsProvider>(builder: (context, value, child) {
-      // User userdetails = value.userdetail;
+    return Consumer<UserDetailsProvider>(builder: (context, value, child) {
+      User userdetails = value.userdetail;
       return WillPopScope(
           onWillPop: _onWillPop,
           child: SafeArea(
@@ -93,8 +94,7 @@ class _Provider_HomeState extends State<Provider_Home> {
                             ),
                           ),
                           Text(
-                            // userdetails.name,
-                            "hjkhjh",
+                            userdetails.name,
                               style: GoogleFonts.commissioner(
                                 fontSize: 19,
                                 fontWeight: FontWeight.w700,
@@ -111,12 +111,30 @@ class _Provider_HomeState extends State<Provider_Home> {
                                 color:
                                     const Color.fromARGB(255, 196, 195, 195)),
                             borderRadius: BorderRadius.circular(50)),
-                        padding: EdgeInsets.all(12),
-                        child: const Icon(
-                          Icons.person,
-                          color: Color.fromRGBO(157, 118, 193, 1),
-                          size: 26,
-                        ),
+                        child:IconButton(
+                          icon:const Icon(
+                              Icons.person,
+                              color: Color.fromRGBO(157, 118, 193, 1),
+
+                            ),
+                          iconSize: 30,
+                          onPressed: (){
+                            Navigator.pushNamed(context, '/profile');
+
+                          },
+                        )
+
+
+                        // padding: EdgeInsets.all(12),
+                        //
+                        // child: const Icon(
+                        //   Icons.person,
+                        //   color: Color.fromRGBO(157, 118, 193, 1),
+                        //   size: 26,
+                        //
+                        // ),
+
+
                       ),
                     ],
                   ),
@@ -162,12 +180,12 @@ class _Provider_HomeState extends State<Provider_Home> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'What are you',
+                        'People/Worker',
                         style: GoogleFonts.commissioner(
                             fontSize: 20, fontWeight: FontWeight.w700),
                       ),
                       Text(
-                        ' offering',
+                        ' Required for',
                         style: GoogleFonts.commissioner(
                           fontSize: 20,
                           fontWeight: FontWeight.w700,
@@ -200,7 +218,7 @@ class _Provider_HomeState extends State<Provider_Home> {
                                     MainAxisAlignment.spaceEvenly,
                                 children: [
                                   Container(
-                                  child:Image.asset("assets/images/provider/gardening_6878388 2.png",
+                                  child:Image.asset("assets/images/provider/gardening.png",
                                   height: 10,
                                   ),
                                     width: 80,
@@ -406,7 +424,7 @@ class _Provider_HomeState extends State<Provider_Home> {
                   Icon(Icons.add,),
                 ]),
           )));
-    // }
-    // );
+    }
+    );
   }
 }

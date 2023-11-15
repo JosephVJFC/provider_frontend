@@ -6,6 +6,7 @@ import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:provider_frontend/constants/globalvariable.dart';
+import '../constants/headers.dart';
 import '../constants/utilities.dart';
 import '../model/user_detail_model.dart';
 // import '../model/user_detailprovider.dart';
@@ -15,9 +16,9 @@ class JsgetUser {
   Future<User> getuser({
     required context,
   }) async {
-    final String apiUrl = '$JbaseUrl/api/getuser';
+    final String apiUrl = '$JbaseUrl/api/jp/getuser';
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? token = prefs.getString("Jstoken");
+    String? token = prefs.getString("Jptoken");
 
     FormData formData = FormData.fromMap({
       'token': token,
@@ -29,6 +30,9 @@ class JsgetUser {
     Response response = await dio.post(
       apiUrl,
       data: formData,
+      options: Options(
+        headers:JsApplicationHeader,
+      ),
     );
 
     if (response.statusCode == 200) {
@@ -41,21 +45,21 @@ class JsgetUser {
         var message_two = message['user'];
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        String Jstoken = message_two['token'];
-        String Jsname = message_two['jsName'];
+        String Jptoken = message_two['token'];
+        String Jpname = message_two['jpName'];
         String Mobile = message_two['mobileNumber'];
         String email = message_two['email'];
-        String Id = message_two['jsId'];
+        String Id = message_two['jpId'];
 
-        await prefs.setString("jsId", "$Id");
-        await prefs.setString("Jstoken", "$Jstoken");
+        await prefs.setString("jpId", "$Id");
+        await prefs.setString("Jstoken", "$Jptoken");
 
         User _user = User(
           mobileNumber: Mobile,
-          name: Jsname,
+          name: Jpname,
           email: email,
-          JsId: Id,
-          token: Jstoken,
+          JpId: Id,
+          token: Jptoken,
         );
 
         // Provider.of<UserDetailsProvider>(context,listen: false).SetUser(_user );
@@ -64,6 +68,7 @@ class JsgetUser {
         //   context,
         //   MaterialPageRoute(
         //     builder: (context) => Home(),
+
         //   ),
         // );
 
@@ -73,12 +78,12 @@ class JsgetUser {
           context: context,
           text: response.data['response'].toString(),
         );
-        return User(token: '', JsId: '', email: '', name: '', mobileNumber: '');
+        return User(token: '', JpId: '', email: '', name: '', mobileNumber: '');
       }
     } else {
       // Handle errors here
       print('API request failed with status code ${response.statusCode}');
-      return User(token: '', JsId: '', email: '', name: '', mobileNumber: '');
+      return User(token: '', JpId: '', email: '', name: '', mobileNumber: '');
     }
   }
 }
