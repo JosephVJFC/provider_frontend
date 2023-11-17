@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider_frontend/model/user_detailprovider.dart';
 import 'package:provider/provider.dart';
-import 'package:provider_frontend/pages/gardening.dart';
+import 'package:provider_frontend/pages/postdetailpage.dart';
 import '../model/user_detail_model.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 
@@ -59,7 +59,7 @@ class _HomeState extends State<Home> {
 
   void _navigateToNextScreen(BuildContext context) {
     Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => GardeningFunction()));
+        .push(MaterialPageRoute(builder: (context) => Postdetailpage()));
   }
 
   @override
