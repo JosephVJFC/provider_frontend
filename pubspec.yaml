@@ -50,6 +50,7 @@ dependencies:
   flutter_phosphor_icons: ^0.0.1+6
   image_picker: ^1.0.4
   dotted_border: ^2.1.0
+  skeletonizer: ^0.8.0
 
 dev_dependencies:
   flutter_test:

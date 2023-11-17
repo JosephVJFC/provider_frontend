@@ -8,7 +8,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:provider_frontend/pages/home.dart';
 
 class Postdetailpage extends StatefulWidget {
-  const Postdetailpage({Key? key}) : super(key: key);
+  final  String? id;
+  final  String? name;
+  const Postdetailpage({Key? key, this.name, this.id}) : super(key: key);
 
   @override
   State<Postdetailpage> createState() => _PostdetailpageState();
@@ -142,7 +144,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                     icon: const Icon(Icons.west_sharp, color: Colors.black),
                   ),
                   Text(
-                    'Gardening',
+                    widget.name ?? "",
                     style: GoogleFonts.commissioner(
                       fontWeight: FontWeight.w600,
                       fontSize: 18,

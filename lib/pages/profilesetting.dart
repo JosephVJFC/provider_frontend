@@ -110,6 +110,7 @@ class _ProfileSettingState extends State<ProfileSetting> {
                       icon: const Icon(Icons.arrow_back),
                       color: Colors.black87,
                       onPressed: () {
+                        Navigator.of(context).pop(true);
                         // Handle arrow back button press here
                       },
                     ),
@@ -145,7 +146,7 @@ class _ProfileSettingState extends State<ProfileSetting> {
                 children: <Widget>[
                   const CircleAvatar(
                     maxRadius: 43,
-                    backgroundImage: AssetImage("lib/images/naren.jpg"),
+                    // backgroundImage: AssetImage("lib/images/naren.jpg"),
                   ),
                   const SizedBox(width: 20),
                   Column(

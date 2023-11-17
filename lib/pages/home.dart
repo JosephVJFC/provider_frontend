@@ -1,11 +1,18 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider_frontend/model/user_detailprovider.dart';
 import 'package:provider/provider.dart';
 import 'package:provider_frontend/pages/postdetailpage.dart';
+import 'package:skeletonizer/skeletonizer.dart';
+import '../model/home_model.dart';
 import '../model/user_detail_model.dart';
 import 'package:curved_navigation_bar/curved_navigation_bar.dart';
+
+import '../service/home_service.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -16,6 +23,29 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  //loading category data
+
+  List<Category> datalist = [];
+  bool _iscatogoryloading = false;
+  Future<void> fetchData() async {
+    setState(() {
+      _iscatogoryloading = true;
+    });
+    final apiCall = GetCategory();
+
+    final allCategory = await apiCall.getcategory(
+      context: context,
+    );
+    setState(() {
+      datalist = allCategory;
+    });
+    setState(() {
+      _iscatogoryloading = false;
+    });
+  }
+
+
   Future<bool> _onWillPop() async {
     return (await showDialog(
           context: context,
@@ -57,14 +87,12 @@ class _HomeState extends State<Home> {
     });
   }
 
-  void _navigateToNextScreen(BuildContext context) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (context) => Postdetailpage()));
-  }
+
 
   @override
   void initState() {
     getuserDetails();
+    fetchData();
     super.initState();
   }
 
@@ -195,70 +223,81 @@ class _HomeState extends State<Home> {
                   const SizedBox(height: 55),
 
                   Expanded(
-                      child: GestureDetector(
-                    onTap: () {
-                      _navigateToNextScreen(context);
-                    },
-                    child: Container(
-                      margin: EdgeInsets.only(left: 30, right: 30),
-                      child: GridView.count(
-                        physics: const BouncingScrollPhysics(),
-                        crossAxisCount: 2,
-                        crossAxisSpacing: 8.0,
-                        mainAxisSpacing: 8.0,
-                        childAspectRatio: 3 / 3,
-                        shrinkWrap: true,
-                        children: List.generate(
-                          6,
-                          (index) {
-                            return Padding(
-                              padding: const EdgeInsets.all(10.0),
-                              child: Container(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(top: 50),
-                                  child: Container(
-                                      child: Column(
-                                    children: [
-                                      Image.asset(
-                                        "lib/assets/provider/car.png",
-                                      ),
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 10),
-                                        child: Text(
-                                          'Driving',
-                                          style: GoogleFonts.commissioner(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
-                                              color: Colors.white),
-                                        ),
-                                      )
-                                    ],
-                                  )),
-                                ),
-                                decoration: const BoxDecoration(
-                                  color: Color.fromRGBO(157, 118, 193, 1),
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20.0),
-                                  ),
-                                ),
+                      child: Skeletonizer(
+                        enabled: _iscatogoryloading,
+                        child: Container(
+                          margin: EdgeInsets.only(left: 30, right: 30),
+                          child: GridView.builder(
+                            physics: const BouncingScrollPhysics(),
+                              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 8.0,
+                              mainAxisSpacing: 8.0,
+                              childAspectRatio: 3 / 3,
                               ),
-                            );
-                          },
+                            shrinkWrap: true,
+                          itemCount: datalist.length,
+                          itemBuilder: (context, index) {
+                          final jobpostData = datalist[index];
+                          final cateiconImage = jobpostData.cateiconImage;
+                          final categoryName = jobpostData.categoryName;
+                          final categoryId = jobpostData.categoryId;
+                                return Padding(
+                                  padding: const EdgeInsets.all(10.0),
+                                  child: Container(
+                                    decoration: const BoxDecoration(
+                                      color: Color.fromRGBO(157, 118, 193, 1),
+                                      borderRadius: BorderRadius.all(
+                                        Radius.circular(20.0),
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(top: 50),
+                                      child: InkWell(
+                                          // onTap: _navigateToNextScreen(context,id:categoryId ,name: categoryName),
+                                          onTap: (){
+                                            Navigator.of(context)
+                                                .push(MaterialPageRoute(builder: (context) => Postdetailpage(id:categoryId ,name: categoryName,)));
+                                          },
+                                          child: Column(
+                                            children: [
+                                          Image.asset(
+                                            cateiconImage,
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.only(top: 10),
+                                            child: Text(
+                                              categoryName,
+                                              style: GoogleFonts.commissioner(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: Colors.white),
+                                            ),
+                                          )
+                                            ],
+                                          ),
+                                        ),
+                                    ),
+                                  ),
+                                );
+                              },
+                          ),
                         ),
-                      ),
-                    ),
-                  )),
+                      )
+    ),
                 ],
               ),
             ),
-            bottomNavigationBar: CurvedNavigationBar(
+                bottomNavigationBar: CurvedNavigationBar(
                 color: const Color.fromRGBO(157, 118, 193, 1),
                 height: 48,
                 backgroundColor: Colors.white,
                 items: const [
-                  Icon(
-                    Icons.add,
-                  ),
+
+                  Text('More'),
+                  // Icon(
+                  //   Icons.add,
+                  // ),
                 ]),
           )));
     });
