@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 // import 'package:flutter_svg/flutter_svg.dart';
@@ -242,49 +243,52 @@ class _HomeState extends State<Home> {
                           final cateiconImage = jobpostData.cateiconImage;
                           final categoryName = jobpostData.categoryName;
                           final categoryId = jobpostData.categoryId;
-                                return Padding(
-                                  padding: const EdgeInsets.all(10.0),
+                                return Card(
+                                  // padding: const EdgeInsets.all(10.0),
                                   child: Container(
                                     decoration: const BoxDecoration(
                                       color: Color.fromRGBO(157, 118, 193, 1),
                                       borderRadius: BorderRadius.all(
-                                        Radius.circular(20.0),
+                                        Radius.circular(10.0),
                                       ),
                                     ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(top: 50),
+
+                                    padding: EdgeInsets.only(top: 30.0),
+
                                       child: InkWell(
-                                          // onTap: _navigateToNextScreen(context,id:categoryId ,name: categoryName),
                                           onTap: (){
                                             Navigator.of(context)
                                                 .push(MaterialPageRoute(builder: (context) => Postdetailpage(id:categoryId ,name: categoryName,)));
                                           },
-                                          child: Column(
-                                            children: [
-                                          Image.asset(
-                                            cateiconImage,
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(top: 10),
-                                            child: Text(
-                                              categoryName,
-                                              style: GoogleFonts.commissioner(
-                                                  fontSize: 15,
-                                                  fontWeight: FontWeight.w500,
-                                                  color: Colors.white),
+                                            child: Column(
+                                              children: [
+                                                SvgPicture.asset(
+                                                  cateiconImage,
+                                                  width:40 , // Set the width of the SVG
+                                                  height: 40, // Set the height of the SVG
+                                                ),
+
+                                            Padding(
+                                              padding: const EdgeInsets.only(top: 10),
+                                             child: Text(
+                                                overflow: TextOverflow.clip,
+                                                categoryName,
+                                                style: GoogleFonts.commissioner(
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                    color: Colors.white),
+                                              ),
+                                            )
+                                              ],
                                             ),
-                                          )
-                                            ],
-                                          ),
                                         ),
-                                    ),
                                   ),
                                 );
                               },
                           ),
                         ),
                       )
-    ),
+                  ),
                 ],
               ),
             ),
