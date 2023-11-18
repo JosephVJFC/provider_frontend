@@ -5,13 +5,12 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:provider_frontend/pages/home.dart';
-
-
+import 'package:intl/intl.dart';
+// import 'package:provider_frontend/pages/home.dart';
 
 class Postdetailpage extends StatefulWidget {
-  final  String? id;
-  final  String? name;
+  final String? id;
+  final String? name;
   const Postdetailpage({Key? key, this.name, this.id}) : super(key: key);
 
   @override
@@ -21,7 +20,7 @@ class Postdetailpage extends StatefulWidget {
 class _PostdetailpageState extends State<Postdetailpage> {
   final TextEditingController _textController = TextEditingController();
   TextEditingController _dateController = TextEditingController();
-   DateTime? _selectedDate;
+  DateTime? _selectedDate;
 
   String selectedJobType = 'Hourly';
 
@@ -29,7 +28,8 @@ class _PostdetailpageState extends State<Postdetailpage> {
 
   // ignore: unused_field
   File? _selectedImage;
-   File? _frontImage;
+  File? _frontImage;
+  TimeOfDay _timeOfDay = TimeOfDay(hour: 00, minute: 00);
 
   // List to store controllers for dynamically generated text fields
   List<TextEditingController> additionalTextControllers = [];
@@ -40,7 +40,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
     _textController.addListener(_updateCharacterCount);
   }
 
-    Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(BuildContext context) async {
     final DateTime picked = (await showDatePicker(
       context: context,
       initialDate: _selectedDate ?? DateTime.now(),
@@ -57,15 +57,23 @@ class _PostdetailpageState extends State<Postdetailpage> {
     }
   }
 
+  void _showTimePicker() {
+    showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    ).then((value) {
+      setState(() {
+        _timeOfDay = value!;
+      });
+    });
+  }
+
   @override
   void dispose() {
     _textController.removeListener(_updateCharacterCount);
     _textController.dispose();
     super.dispose();
   }
-
-
-
 
   // The setState triggers a rebuild when text changes
   void _updateCharacterCount() {
@@ -118,7 +126,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
       );
 
       if (selectedJobType == 'Fixed Cost + Bata') {
-        additionalTextFields.add( 
+        additionalTextFields.add(
           TextFormField(
             controller: additionalTextControllers.length <= 1
                 ? TextEditingController()
@@ -161,7 +169,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                 children: [
                   IconButton(
                     onPressed: () {
-                        Navigator.pop(context);
+                      Navigator.pop(context);
                     },
                     icon: const Icon(Icons.west_sharp, color: Colors.black),
                   ),
@@ -375,42 +383,41 @@ class _PostdetailpageState extends State<Postdetailpage> {
                       ),
                     },
 
-                     const SizedBox(height: 25),
+                    const SizedBox(height: 25),
+
                     TextFormField(
                       controller: _dateController,
                       decoration: InputDecoration(
-                        hintText: 'Date',
-                         suffixIcon: IconButton(
-                          icon: const Icon(
-                            Icons.calendar_today,
-                          ),
-                          onPressed: () => _selectDate(context),
-                        ),
-                        hintStyle: GoogleFonts.commissioner(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5),
-                        ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2),
+                        hintText: 'Select Date',
+                        suffixIcon: IconButton(
+                          icon: Icon(Icons.calendar_today),
+                          onPressed: () async {
+                            DateTime? picked = await showDatePicker(
+                              context: context,
+                              initialDate: DateTime.now(),
+                              firstDate: DateTime(2015, 8),
+                              lastDate: DateTime(2101),
+                            );
+                            if (picked != null && picked != _selectedDate) {
+                              String formattedDate =
+                                  DateFormat('dd-MM-yyyy').format(picked);
+                              _dateController.text = formattedDate;
+                            }
+                          },
                         ),
                       ),
                     ),
 
-
-                     const SizedBox(height: 25),
+                    const SizedBox(height: 25),
                     TextFormField(
                       decoration: InputDecoration(
-                        hintText: 'Time',
+                        hintText: _timeOfDay.format(context).toString(),
+                        suffixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.timer,
+                          ),
+                          onPressed: _showTimePicker,
+                        ),
                         hintStyle: GoogleFonts.commissioner(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -430,7 +437,6 @@ class _PostdetailpageState extends State<Postdetailpage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 25),
                     TextFormField(
                       decoration: InputDecoration(
@@ -477,9 +483,11 @@ class _PostdetailpageState extends State<Postdetailpage> {
                         ),
                       ),
                     ),
+
                     const SizedBox(
                       height: 25,
                     ),
+
                     TextFormField(
                       decoration: InputDecoration(
                         hintText: 'Location',
@@ -509,47 +517,49 @@ class _PostdetailpageState extends State<Postdetailpage> {
                   ],
                 ),
               ),
+
               const SizedBox(height: 60),
+
               Column(
                 children: [
                   DottedBorder(
-                  color: const Color.fromRGBO(157, 118, 193, 1),
-                  strokeWidth: 1,
-                  borderType: BorderType.RRect,
-                  radius: const Radius.circular(10),
-                  dashPattern: const [10, 10],
-                  child: SizedBox(
-                    width: 330,
-                    height: 150,
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        _buildImageUploadButton(Icons.image_outlined,
-                            _frontImage, () => _pickFrontImage()),
-                        // Text(
-                        //   'Front Side',
-                        //   style: GoogleFonts.commissioner(
-                        //     fontWeight: FontWeight.w400,
-                        //     fontSize: 10,
-                        //     color: const Color.fromRGBO(157, 118, 193, 1),
-                        //   ),
-                        // ),
-                        // Padding(
-                        //   padding: const EdgeInsets.only(top: 10.0),
-                        //   child: Text(
-                        //     // 'Upload the front side of the document.\nSupport JPEG, PNG, and PDF',
-                        //     textAlign: TextAlign.center,
-                        //     style: GoogleFonts.commissioner(
-                        //       fontWeight: FontWeight.w400,
-                        //       fontSize: 9,
-                        //       color: const Color.fromRGBO(157, 118, 193, 1),
-                        //     ),
-                        //   ),
-                        // ),
-                      ],
+                    color: const Color.fromRGBO(157, 118, 193, 1),
+                    strokeWidth: 1,
+                    borderType: BorderType.RRect,
+                    radius: const Radius.circular(10),
+                    dashPattern: const [10, 10],
+                    child: SizedBox(
+                      width: 330,
+                      height: 150,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          _buildImageUploadButton(Icons.image_outlined,
+                              _frontImage, () => _pickFrontImage()),
+                          // Text(
+                          //   'Front Side',
+                          //   style: GoogleFonts.commissioner(
+                          //     fontWeight: FontWeight.w400,
+                          //     fontSize: 10,
+                          //     color: const Color.fromRGBO(157, 118, 193, 1),
+                          //   ),
+                          // ),
+                          // Padding(
+                          //   padding: const EdgeInsets.only(top: 10.0),
+                          //   child: Text(
+                          //     // 'Upload the front side of the document.\nSupport JPEG, PNG, and PDF',
+                          //     textAlign: TextAlign.center,
+                          //     style: GoogleFonts.commissioner(
+                          //       fontWeight: FontWeight.w400,
+                          //       fontSize: 9,
+                          //       color: const Color.fromRGBO(157, 118, 193, 1),
+                          //     ),
+                          //   ),
+                          // ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
                   const SizedBox(height: 30),
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
@@ -570,6 +580,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                       ),
                     ),
                   ),
+                  const SizedBox(height: 30),
                 ],
               ),
             ],
@@ -583,11 +594,10 @@ class _PostdetailpageState extends State<Postdetailpage> {
     );
   }
 
-
-Future<void> _pickFrontImage() async {
-    final pickedImage =
-        await ImagePicker().pickImage(source: ImageSource.gallery,maxWidth: 400,maxHeight: 132);
-        //  await ImagePicker().pickImage(source: ImageSource.camera);
+  Future<void> _pickFrontImage() async {
+    final pickedImage = await ImagePicker()
+        .pickImage(source: ImageSource.gallery, maxWidth: 400, maxHeight: 132);
+    //  await ImagePicker().pickImage(source: ImageSource.camera);
     if (pickedImage != null) {
       setState(() {
         _frontImage = File(pickedImage.path);
@@ -595,7 +605,7 @@ Future<void> _pickFrontImage() async {
     }
   }
 
-   Widget _buildImageUploadButton(
+  Widget _buildImageUploadButton(
       IconData icon, File? image, VoidCallback onPressed) {
     return IconButton(
       icon: image != null ? Image.file(image) : Icon(icon),
@@ -605,8 +615,6 @@ Future<void> _pickFrontImage() async {
     );
   }
 
-
-  
   // Image Picker
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
@@ -622,29 +630,3 @@ Future<void> _pickFrontImage() async {
     }
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
