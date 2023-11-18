@@ -7,6 +7,8 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider_frontend/pages/home.dart';
 
+
+
 class Postdetailpage extends StatefulWidget {
   final  String? id;
   final  String? name;
@@ -18,6 +20,9 @@ class Postdetailpage extends StatefulWidget {
 
 class _PostdetailpageState extends State<Postdetailpage> {
   final TextEditingController _textController = TextEditingController();
+  TextEditingController _dateController = TextEditingController();
+   DateTime? _selectedDate;
+
   String selectedJobType = 'Hourly';
 
   int maxCharacters = 400; // Adjusted the character limit to 400
@@ -33,6 +38,23 @@ class _PostdetailpageState extends State<Postdetailpage> {
   void initState() {
     super.initState();
     _textController.addListener(_updateCharacterCount);
+  }
+
+    Future<void> _selectDate(BuildContext context) async {
+    final DateTime picked = (await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime(2100),
+    ))!;
+
+    // ignore: unnecessary_null_comparison
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        String formatteddate = "${picked.day}/${picked.month}/${picked.year}";
+      });
+    }
   }
 
   @override
@@ -96,7 +118,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
       );
 
       if (selectedJobType == 'Fixed Cost + Bata') {
-        additionalTextFields.add(
+        additionalTextFields.add( 
           TextFormField(
             controller: additionalTextControllers.length <= 1
                 ? TextEditingController()
@@ -352,6 +374,62 @@ class _PostdetailpageState extends State<Postdetailpage> {
                         ),
                       ),
                     },
+
+                     const SizedBox(height: 25),
+                    TextFormField(
+                      controller: _dateController,
+                      decoration: InputDecoration(
+                        hintText: 'Date',
+                         suffixIcon: IconButton(
+                          icon: const Icon(
+                            Icons.calendar_today,
+                          ),
+                          onPressed: () => _selectDate(context),
+                        ),
+                        hintStyle: GoogleFonts.commissioner(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromRGBO(217, 217, 217, 1),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 5.0, horizontal: 10.0),
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color.fromRGBO(157, 118, 193, 1),
+                              width: 2.5),
+                        ),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color.fromRGBO(157, 118, 193, 1),
+                              width: 2),
+                        ),
+                      ),
+                    ),
+
+
+                     const SizedBox(height: 25),
+                    TextFormField(
+                      decoration: InputDecoration(
+                        hintText: 'Time',
+                        hintStyle: GoogleFonts.commissioner(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: const Color.fromRGBO(217, 217, 217, 1),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                            vertical: 5.0, horizontal: 10.0),
+                        focusedBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color.fromRGBO(157, 118, 193, 1),
+                              width: 2.5),
+                        ),
+                        enabledBorder: const UnderlineInputBorder(
+                          borderSide: BorderSide(
+                              color: Color.fromRGBO(157, 118, 193, 1),
+                              width: 2),
+                        ),
+                      ),
+                    ),
 
                     const SizedBox(height: 25),
                     TextFormField(
