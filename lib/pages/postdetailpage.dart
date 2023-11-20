@@ -1,3 +1,5 @@
+// ignore_for_file: unused_local_variable, equal_elements_in_set
+
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -5,8 +7,12 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:image_picker/image_picker.dart';
+// import 'package:mpmprovider/preview.dart';
 import 'package:intl/intl.dart';
-// import 'package:provider_frontend/pages/home.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import '../model/home_model.dart';
+import '../service/home_service.dart';
 
 class Postdetailpage extends StatefulWidget {
   final String? id;
@@ -18,54 +24,44 @@ class Postdetailpage extends StatefulWidget {
 }
 
 class _PostdetailpageState extends State<Postdetailpage> {
+
+  TextEditingController jobtitlecontroller = TextEditingController();
+  TextEditingController jobdescontroller = TextEditingController();
+  TextEditingController hourscontroller = TextEditingController();
+  TextEditingController dayscontroller = TextEditingController();
+  TextEditingController jobcostcontroller = TextEditingController();
+  TextEditingController phonecontroller = TextEditingController();
+  TextEditingController locationcontroller = TextEditingController();
+  TextEditingController addresscontroller = TextEditingController();
+  TextEditingController _toDatesController = TextEditingController();
+
+
+
+
+
+
   final TextEditingController _textController = TextEditingController();
-  TextEditingController _dateController = TextEditingController();
+  List<TextEditingController> additionalTextControllers = [];
+
+  final TextEditingController _fromDateController = TextEditingController();
+  final TextEditingController _toDateController = TextEditingController();
+  final TextEditingController _fromTimeController = TextEditingController();
+  final TextEditingController _toTimeController = TextEditingController();
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
   DateTime? _selectedDate;
 
   String selectedJobType = 'Hourly';
 
-  int maxCharacters = 400; // Adjusted the character limit to 400
+  int maxCharacters = 400;
 
-  // ignore: unused_field
   File? _selectedImage;
-  File? _frontImage;
-  TimeOfDay _timeOfDay = TimeOfDay(hour: 00, minute: 00);
-
-  // List to store controllers for dynamically generated text fields
-  List<TextEditingController> additionalTextControllers = [];
 
   @override
   void initState() {
     super.initState();
     _textController.addListener(_updateCharacterCount);
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime picked = (await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
-      firstDate: DateTime(1900),
-      lastDate: DateTime(2100),
-    ))!;
-
-    // ignore: unnecessary_null_comparison
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-        String formatteddate = "${picked.day}/${picked.month}/${picked.year}";
-      });
-    }
-  }
-
-  void _showTimePicker() {
-    showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.now(),
-    ).then((value) {
-      setState(() {
-        _timeOfDay = value!;
-      });
-    });
   }
 
   @override
@@ -75,15 +71,117 @@ class _PostdetailpageState extends State<Postdetailpage> {
     super.dispose();
   }
 
-  // The setState triggers a rebuild when text changes
   void _updateCharacterCount() {
     setState(() {});
   }
 
+  Future<void> _showFromTimePicker() async {
+
+
+    TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (selectedTime != null) {
+      setState(() {
+        String formattedTime = selectedTime.format(context);
+        _fromTimeController.text = formattedTime;
+      });
+    }
+  }
+
+  Future<void> _showToTimePicker() async {
+    TimeOfDay? selectedTime = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+
+    if (selectedTime != null) {
+      setState(() {
+        String formattedTime = selectedTime.format(context);
+        _toTimeController.text = formattedTime;
+      });
+    }
+  }
+
+  Future<void> _selectFromDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2015, 8),
+      lastDate: DateTime(2101),
+    );
+
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
+        _fromDateController.text = formattedDate;
+      });
+    }
+  }
+
+  Future<void> _selectToDate() async {
+    DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2015, 8),
+      lastDate: DateTime(2101),
+    );
+
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
+        _toDateController.text = formattedDate;
+      });
+    }
+  }
+
+  PostJobdetails postjob = PostJobdetails();
+
+  postjobrecords() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var jpId = prefs.getString("user");
+
+    postjob.postjob(
+        postedBy:widget.id,
+        jobType:jobtitlecontroller.text,
+        jobTitle:jobtitlecontroller.text,
+        jobDescription:jobdescontroller.text,
+        jobAddress:addresscontroller.text,
+        jobImage:_selectedImage,
+        jobContact:phonecontroller.text,
+        location:locationcontroller.text,
+        jobFromtime:_fromTimeController.text,
+        jobTotime:_toDateController.text,
+        jobFromdate:_fromDateController.text,
+        jobTodate:_toDateController.text,
+        jobcateId:jpId,
+        jobBata:_toDatesController.text,
+        jobCost:jobcostcontroller.text,
+        jobworkingHours:hourscontroller.text,
+        jobworkingDays:dayscontroller.text,
+        context:context
+        );
+  }
+
+
+
+
+
+
+
+
+
+
+
+
   @override
   Widget build(BuildContext context) {
-    // ignore: unused_local_variable
     final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
     // Dispose additional controllers
     for (var controller in additionalTextControllers) {
@@ -97,9 +195,17 @@ class _PostdetailpageState extends State<Postdetailpage> {
         selectedJobType == 'Fixed Cost + Bata') {
       additionalTextFields.add(
         TextFormField(
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'This field is required';
+            }
+            return null;
+          },
+
+          keyboardType: TextInputType.number,
           controller: additionalTextControllers.isEmpty
               ? TextEditingController()
-              : additionalTextControllers[0],
+              : _toDatesController,
           decoration: InputDecoration(
             hintText: 'Enter Amount',
             hintStyle: GoogleFonts.commissioner(
@@ -107,8 +213,10 @@ class _PostdetailpageState extends State<Postdetailpage> {
               fontWeight: FontWeight.w500,
               color: const Color.fromRGBO(217, 217, 217, 1),
             ),
-            contentPadding:
-                const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
+            contentPadding: const EdgeInsets.symmetric(
+              vertical: 5.0,
+              horizontal: 10.0,
+            ),
             focusedBorder: const UnderlineInputBorder(
               borderSide: BorderSide(
                 color: Color.fromRGBO(157, 118, 193, 1),
@@ -127,32 +235,46 @@ class _PostdetailpageState extends State<Postdetailpage> {
 
       if (selectedJobType == 'Fixed Cost + Bata') {
         additionalTextFields.add(
-          TextFormField(
-            controller: additionalTextControllers.length <= 1
-                ? TextEditingController()
-                : additionalTextControllers[1],
-            decoration: InputDecoration(
-              hintText: 'Enter Batta Amount',
-              hintStyle: GoogleFonts.commissioner(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: const Color.fromRGBO(217, 217, 217, 1),
-              ),
-              contentPadding:
-                  const EdgeInsets.symmetric(vertical: 5.0, horizontal: 10.0),
-              focusedBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color.fromRGBO(157, 118, 193, 1),
-                  width: 2.5,
+          Column(
+            children: [
+              const SizedBox(height: 25),
+              TextFormField(
+                validator: (value) {
+                  if (value == null || value.isEmpty) {
+                    return 'This field is required';
+                  }
+                  return null;
+                },
+                keyboardType: TextInputType.number,
+                controller: additionalTextControllers.length <= 1
+                    ? TextEditingController()
+                    : additionalTextControllers[1],
+                decoration: InputDecoration(
+                  hintText: 'Enter Batta Amount',
+                  hintStyle: GoogleFonts.commissioner(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: const Color.fromRGBO(217, 217, 217, 1),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 5.0,
+                    horizontal: 10.0,
+                  ),
+                  focusedBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromRGBO(157, 118, 193, 1),
+                      width: 2.5,
+                    ),
+                  ),
+                  enabledBorder: const UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromRGBO(157, 118, 193, 1),
+                      width: 2,
+                    ),
+                  ),
                 ),
               ),
-              enabledBorder: const UnderlineInputBorder(
-                borderSide: BorderSide(
-                  color: Color.fromRGBO(157, 118, 193, 1),
-                  width: 2,
-                ),
-              ),
-            ),
+            ],
           ),
         );
       }
@@ -161,167 +283,48 @@ class _PostdetailpageState extends State<Postdetailpage> {
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: <Widget>[
-              const SizedBox(height: 10),
-              Row(
-                children: [
-                  IconButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    icon: const Icon(Icons.west_sharp, color: Colors.black),
-                  ),
-                  Text(
-                    widget.name ?? "",
-                    style: GoogleFonts.commissioner(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 18,
-                      color: Colors.black,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                ),
-                child: Column(
+          physics: const BouncingScrollPhysics(),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: <Widget>[
+                const SizedBox(height: 10),
+                Row(
                   children: [
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Job title',
-                        hintStyle: GoogleFonts.commissioner(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5),
-                        ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2),
-                        ),
+                    IconButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                      },
+                      icon: const Icon(Icons.west_sharp, color: Colors.black),
+                    ),
+                    Text(
+                      widget.name ?? "",
+                      style: GoogleFonts.commissioner(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 18,
+                        color: Colors.black,
                       ),
                     ),
-                    const SizedBox(height: 25),
-                    TextFormField(
-                      controller: _textController,
-                      inputFormatters: [
-                        LengthLimitingTextInputFormatter(maxCharacters),
-                      ],
-                      maxLines: null, // Allow multiple lines of text
-                      decoration: InputDecoration(
-                        hintText: 'Job Description*',
-                        hintStyle: GoogleFonts.commissioner(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5),
-                        ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2),
-                        ),
-                      ),
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          '${_textController.text.length}/$maxCharacters',
-                          style: GoogleFonts.commissioner(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w500,
-                            color: _textController.text.length > maxCharacters
-                                ? Colors.red
-                                : Colors.black,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 25),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Job type',
-                        hintStyle: GoogleFonts.commissioner(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5),
-                        ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2),
-                        ),
-                        suffixIcon: DropdownButtonHideUnderline(
-                          child: DropdownButton<String>(
-                            value: selectedJobType,
-                            icon: const Icon(
-                              Icons.arrow_drop_down,
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                            ),
-                            iconSize: 24,
-                            elevation: 16,
-                            style: GoogleFonts.commissioner(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                              color: Colors.black,
-                            ),
-                            onChanged: (String? newValue) {
-                              if (newValue != null) {
-                                setState(() {
-                                  selectedJobType = newValue;
-                                });
-                              }
-                            },
-                            items: <String>[
-                              'Hourly',
-                              'Days',
-                              'Fixed Cost',
-                              'Fixed Cost + Bata',
-                            ].map<DropdownMenuItem<String>>((String value) {
-                              return DropdownMenuItem<String>(
-                                value: value,
-                                child: Text(value),
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    // Dynamic Text Fields
-                    const SizedBox(height: 25),
-                    ...additionalTextFields,
-
-                    if (selectedJobType != 'Fixed Cost' &&
-                        selectedJobType != 'Fixed Cost + Bata') ...{
+                  ],
+                ),
+                const SizedBox(height: 15),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                  ),
+                  child: Column(
+                    children: [
                       TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        controller: jobtitlecontroller,
                         decoration: InputDecoration(
-                          hintText: selectedJobType == 'Hourly'
-                              ? 'How Many Hours works'
-                              : 'How Many Days works',
+                          hintText: 'Job title',
                           hintStyle: GoogleFonts.commissioner(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -331,18 +334,163 @@ class _PostdetailpageState extends State<Postdetailpage> {
                               vertical: 5.0, horizontal: 10.0),
                           focusedBorder: const UnderlineInputBorder(
                             borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5,
-                            ),
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2.5),
                           ),
                           enabledBorder: const UnderlineInputBorder(
                             borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2,
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 25),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        controller: jobdescontroller,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(maxCharacters),
+                        ],
+                        maxLines: null, // Allow multiple lines of text
+                        decoration: InputDecoration(
+                          hintText: 'Job Description*',
+                          hintStyle: GoogleFonts.commissioner(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: const Color.fromRGBO(217, 217, 217, 1),
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2.5),
+                          ),
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2),
+                          ),
+                        ),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${_textController.text.length}/$maxCharacters',
+                            style: GoogleFonts.commissioner(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w500,
+                              color: _textController.text.length > maxCharacters
+                                  ? Colors.red
+                                  : Colors.black,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      TextFormField(
+                        readOnly: true,
+                        decoration: InputDecoration(
+                          hintText: 'Job type',
+                          hintStyle: GoogleFonts.commissioner(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: const Color.fromRGBO(217, 217, 217, 1),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 10.0),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2.5),
+                          ),
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2),
+                          ),
+                          suffixIcon: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: selectedJobType,
+                              icon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                              ),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: GoogleFonts.commissioner(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    selectedJobType = newValue;
+                                  });
+                                }
+                              },
+                              items: <String>[
+                                'Hourly',
+                                'Days',
+                                'Fixed Cost',
+                                'Fixed Cost + Bata',
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
                             ),
                           ),
                         ),
                       ),
+
+                      // Dynamic Text Fields
+                      const SizedBox(height: 25),
+                      ...additionalTextFields,
+                      if (selectedJobType == 'Hourly' ||
+                          selectedJobType == 'Days') ...{
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'This field is required';
+                            }
+                            return null;
+                          },
+                          controller: selectedJobType == 'Hourly'
+                              ? hourscontroller
+                              : dayscontroller,
+                                  decoration: InputDecoration(
+                            hintText: selectedJobType == 'Hourly'
+                                ? 'How Many Hours works'
+                                : 'How Many Days works',
+                            hintStyle: GoogleFonts.commissioner(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color.fromRGBO(217, 217, 217, 1),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 5.0, horizontal: 10.0),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2.5,
+                              ),
+                            ),
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                        ),
+                      },
                       const SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.start,
@@ -357,7 +505,217 @@ class _PostdetailpageState extends State<Postdetailpage> {
                           ),
                         ],
                       ),
+
+                      const SizedBox(
+                        height: 25,
+                      ),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'This field is required';
+                                }
+                                return null;
+                              },
+                              readOnly: true,
+                              controller: _fromDateController,
+                              decoration: InputDecoration(
+                                hintText: 'From Date',
+                                hintStyle: GoogleFonts.commissioner(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color.fromRGBO(217, 217, 217, 1),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 15.0, horizontal: 10.0),
+                                // filled: true,
+                                // fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(157, 118, 193, 1),
+                                    width: 2.5,
+                                  ),
+                                ),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(157, 118, 193, 1),
+                                    width: 2,
+                                  ),
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.calendar_today,size: 18,),
+                                  color: Colors.black,
+                                  onPressed: _selectFromDate,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'This field is required';
+                                }
+                                return null;
+                              },
+                              readOnly: true,
+                              controller: _toDateController,
+                              decoration: InputDecoration(
+                                hintText: 'To Date',
+                                hintStyle: GoogleFonts.commissioner(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: const Color.fromRGBO(217, 217, 217, 1),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    vertical: 15.0, horizontal: 10.0),
+                                // filled: true,
+                                // fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(157, 118, 193, 1),
+                                    width: 2.5,
+                                  ),
+                                ),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(157, 118, 193, 1),
+                                    width: 2,
+                                  ),
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.calendar_today,size: 18,),
+                                  color: Colors.black,
+                                  onPressed: _selectToDate,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 25),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'This field is required';
+                                }
+                                return null;
+                              },
+                              readOnly: true,
+                              controller: _fromTimeController,
+                              decoration: InputDecoration(
+                                hintText: 'From Time',
+                                hintStyle: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color.fromRGBO(217, 217, 217, 1),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 15.0,
+                                  horizontal: 10.0,
+                                ),
+                                // filled: true,
+                                // fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(157, 118, 193, 1),
+                                    width: 2.5,
+                                  ),
+                                ),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(157, 118, 193, 1),
+                                    width: 2,
+                                  ),
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.timer,size: 18,),
+                                  color: Colors.black,
+                                  onPressed: _showFromTimePicker,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 20),
+                          Expanded(
+                            child: TextFormField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'This field is required';
+                                }
+                                return null;
+                              },
+                              readOnly: true,
+                              controller: _toTimeController,
+                              decoration: InputDecoration(
+                                hintText: 'To Time',
+                                hintStyle: const TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Color.fromRGBO(217, 217, 217, 1),
+                                ),
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 15.0,
+                                  horizontal: 10.0,
+                                ),
+                                // filled: true,
+                                // fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                                focusedBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(157, 118, 193, 1),
+                                    width: 2.5,
+                                  ),
+                                ),
+                                enabledBorder: const OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                    color: Color.fromRGBO(157, 118, 193, 1),
+                                    width: 2,
+                                  ),
+                                ),
+                                suffixIcon: IconButton(
+                                  icon: const Icon(Icons.lock_clock_rounded,size: 20,),
+                                  color: Colors.black,
+                                  onPressed: _showToTimePicker,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(
+                        height: 25,
+                      ),
+
+                      ///////////////////////////////////////
+
                       TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        controller: jobcostcontroller,
+                        keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           hintText: 'Cost',
                           hintStyle: GoogleFonts.commissioner(
@@ -381,209 +739,229 @@ class _PostdetailpageState extends State<Postdetailpage> {
                           ),
                         ),
                       ),
-                    },
 
-                    const SizedBox(height: 25),
-
-                    TextFormField(
-                      controller: _dateController,
-                      decoration: InputDecoration(
-                        hintText: 'Select Date',
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.calendar_today),
-                          onPressed: () async {
-                            DateTime? picked = await showDatePicker(
-                              context: context,
-                              initialDate: DateTime.now(),
-                              firstDate: DateTime(2015, 8),
-                              lastDate: DateTime(2101),
-                            );
-                            if (picked != null && picked != _selectedDate) {
-                              String formattedDate =
-                                  DateFormat('dd-MM-yyyy').format(picked);
-                              _dateController.text = formattedDate;
-                            }
-                          },
-                        ),
+                      const SizedBox(
+                        height: 25,
                       ),
-                    ),
 
-                    const SizedBox(height: 25),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: _timeOfDay.format(context).toString(),
-                        suffixIcon: IconButton(
-                          icon: const Icon(
-                            Icons.timer,
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^[0-9]{0,10}$')),
+                        ],
+                        controller: phonecontroller,
+                        decoration: InputDecoration(
+                          hintText: 'Contact number',
+                          hintStyle: GoogleFonts.commissioner(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: const Color.fromRGBO(217, 217, 217, 1),
                           ),
-                          onPressed: _showTimePicker,
-                        ),
-                        hintStyle: GoogleFonts.commissioner(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
+                          contentPadding: const EdgeInsets.symmetric(
+                            vertical: 5.0,
+                            horizontal: 10.0,
+                          ),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
                               color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5),
-                        ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
+                              width: 2.5,
+                            ),
+                          ),
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
                               color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2),
+                              width: 2,
+                            ),
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 25),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Contact number',
-                        hintStyle: GoogleFonts.commissioner(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5),
-                        ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 25),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Address',
-                        hintStyle: GoogleFonts.commissioner(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5),
-                        ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2),
-                        ),
-                      ),
-                    ),
 
-                    const SizedBox(
-                      height: 25,
-                    ),
+                      const SizedBox(height: 25),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        controller: addresscontroller,
+                        decoration: InputDecoration(
+                          hintText: 'Address',
+                          hintStyle: GoogleFonts.commissioner(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: const Color.fromRGBO(217, 217, 217, 1),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 10.0),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2.5),
+                          ),
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 25,
+                      ),
+                      TextFormField(
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'This field is required';
+                          }
+                          return null;
+                        },
+                        controller:locationcontroller,
 
-                    TextFormField(
-                      decoration: InputDecoration(
-                        hintText: 'Location',
-                        hintStyle: GoogleFonts.commissioner(
+                        decoration: InputDecoration(
+                          hintText: 'Location',
+                          hintStyle: GoogleFonts.commissioner(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                            color: const Color.fromRGBO(217, 217, 217, 1),
+                          ),
+                          contentPadding: const EdgeInsets.symmetric(
+                              vertical: 5.0, horizontal: 10.0),
+                          focusedBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2.5),
+                          ),
+                          enabledBorder: const UnderlineInputBorder(
+                            borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2),
+                          ),
+                          suffixIcon: const Icon(
+                            Icons.arrow_drop_down,
+                            color: Color.fromRGBO(157, 118, 193, 1),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 60),
+
+                // ///////////////////////////////////////////////////////////////////////////
+
+                Column(
+                  children: [
+                    DottedBorder(
+                      color: const Color.fromRGBO(157, 118, 193, 1),
+                      strokeWidth: 1,
+                      borderType: BorderType.RRect,
+                      radius: const Radius.circular(10),
+                      dashPattern: const [10, 10],
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          InkWell(
+                            onTap: () {
+                              _showImagePickerOption();
+                            },
+                            child: SizedBox(
+                              width: 340,
+                              height: 160,
+                              child: _selectedImage != null
+                                  ? ClipRRect(
+                                borderRadius: BorderRadius.circular(10),
+                                child: Image.file(
+                                  _selectedImage!,
+                                  width: 80, // Adjust the width as needed
+                                  height:
+                                  70, // Adjust the height as needed
+                                ),
+                              )
+                                  : Column(
+                                mainAxisAlignment:
+                                MainAxisAlignment.center,
+                                children: [
+                                  const Icon(
+                                    Icons.image_outlined,
+                                    color:
+                                    Color.fromRGBO(157, 118, 193, 1),
+                                    size: 35,
+                                  ),
+                                  Text(
+                                    'Upload photos',
+                                    style: GoogleFonts.commissioner(
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 10,
+                                      color: const Color.fromRGBO(
+                                          157, 118, 193, 1),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          Positioned(
+                            top: 5,
+                            right: 5,
+                            child: _selectedImage != null
+                                ? InkWell(
+                              onTap: () {
+                                setState(() {
+                                  _selectedImage = null;
+                                });
+                              },
+                              child: const Icon(
+                                Icons.cancel,
+                                color: Colors.red,
+                              ),
+                            )
+                                : const SizedBox(),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 50.0, vertical: 8.0),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                        backgroundColor: const Color.fromRGBO(157, 118, 193, 1),
+                      ),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          postjobrecords();
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => const Preview(),
+                          //   ),
+                          // );
+                        }
+                      },
+                      child: Text(
+                        'Upload',
+                        style: GoogleFonts.commissioner(
+                          fontWeight: FontWeight.w600,
                           fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color.fromRGBO(217, 217, 217, 1),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            vertical: 5.0, horizontal: 10.0),
-                        focusedBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5),
-                        ),
-                        enabledBorder: const UnderlineInputBorder(
-                          borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2),
-                        ),
-                        suffixIcon: const Icon(
-                          Icons.arrow_drop_down,
-                          color: Color.fromRGBO(157, 118, 193, 1),
+                          color: Colors.white,
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-
-              const SizedBox(height: 60),
-
-              Column(
-                children: [
-                  DottedBorder(
-                    color: const Color.fromRGBO(157, 118, 193, 1),
-                    strokeWidth: 1,
-                    borderType: BorderType.RRect,
-                    radius: const Radius.circular(10),
-                    dashPattern: const [10, 10],
-                    child: SizedBox(
-                      width: 330,
-                      height: 150,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          _buildImageUploadButton(Icons.image_outlined,
-                              _frontImage, () => _pickFrontImage()),
-                          // Text(
-                          //   'Front Side',
-                          //   style: GoogleFonts.commissioner(
-                          //     fontWeight: FontWeight.w400,
-                          //     fontSize: 10,
-                          //     color: const Color.fromRGBO(157, 118, 193, 1),
-                          //   ),
-                          // ),
-                          // Padding(
-                          //   padding: const EdgeInsets.only(top: 10.0),
-                          //   child: Text(
-                          //     // 'Upload the front side of the document.\nSupport JPEG, PNG, and PDF',
-                          //     textAlign: TextAlign.center,
-                          //     style: GoogleFonts.commissioner(
-                          //       fontWeight: FontWeight.w400,
-                          //       fontSize: 9,
-                          //       color: const Color.fromRGBO(157, 118, 193, 1),
-                          //     ),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 50.0, vertical: 8.0),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      backgroundColor: const Color.fromRGBO(157, 118, 193, 1),
-                    ),
-                    onPressed: () {},
-                    child: Text(
-                      'Upload',
-                      style: GoogleFonts.commissioner(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 14,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 30),
-                ],
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -594,28 +972,64 @@ class _PostdetailpageState extends State<Postdetailpage> {
     );
   }
 
-  Future<void> _pickFrontImage() async {
-    final pickedImage = await ImagePicker()
-        .pickImage(source: ImageSource.gallery, maxWidth: 400, maxHeight: 132);
-    //  await ImagePicker().pickImage(source: ImageSource.camera);
-    if (pickedImage != null) {
-      setState(() {
-        _frontImage = File(pickedImage.path);
-      });
-    }
-  }
-
-  Widget _buildImageUploadButton(
-      IconData icon, File? image, VoidCallback onPressed) {
-    return IconButton(
-      icon: image != null ? Image.file(image) : Icon(icon),
-      iconSize: 45,
-      color: const Color.fromRGBO(157, 118, 193, 1),
-      onPressed: onPressed,
+  Future<void> _showImagePickerOption() async {
+    await showModalBottomSheet(
+      backgroundColor: Colors.white,
+      context: context,
+      builder: (builder) {
+        return Padding(
+          padding: const EdgeInsets.all(18.0),
+          child: SizedBox(
+            width: MediaQuery.of(context).size.width,
+            height: 100,
+            child: Row(
+              children: [
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      _pickImage(ImageSource.gallery);
+                    },
+                    child: const SizedBox(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.image,
+                            size: 40,
+                            color: Color.fromRGBO(157, 118, 193, 1),
+                          ),
+                          Text("Gallery")
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: InkWell(
+                    onTap: () {
+                      _pickImage(ImageSource.camera);
+                    },
+                    child: const SizedBox(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.camera_alt,
+                            size: 40,
+                            color: Color.fromRGBO(157, 118, 193, 1),
+                          ),
+                          Text("Camera")
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 
-  // Image Picker
   Future<void> _pickImage(ImageSource source) async {
     final ImagePicker picker = ImagePicker();
 
