@@ -271,10 +271,12 @@ class _HomeState extends State<Home> {
                                             Padding(
                                               padding: const EdgeInsets.only(top: 10),
                                              child: Text(
-                                                overflow: TextOverflow.clip,
+
                                                 categoryName,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
                                                 style: GoogleFonts.commissioner(
-                                                    fontSize: 12,
+                                                    fontSize: 15,
                                                     fontWeight: FontWeight.w500,
                                                     color: Colors.white),
                                               ),

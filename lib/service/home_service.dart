@@ -159,7 +159,7 @@ class PostJobdetails {
       // Handle a successful response
       if (response.data['status'] == "1") {
         print('API response: ${response.data}');
-        // var message = response.data['response'];
+        var message = response.data['response'];
         // var itemData = message['categories'];
         // for (var itemData in categoryDetails) {
           // Process each item and add it to the dataList
@@ -206,6 +206,11 @@ class PostJobdetails {
           //
           // );
         // }
+        showCustomSnackBar(
+          context: context,
+          text: message.toString(),
+        );
+
       } else {
         showCustomSnackBar(
           context: context,
