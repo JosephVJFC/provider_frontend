@@ -33,14 +33,12 @@ class _PostdetailpageState extends State<Postdetailpage> {
   TextEditingController phonecontroller = TextEditingController();
   TextEditingController locationcontroller = TextEditingController();
   TextEditingController addresscontroller = TextEditingController();
-  TextEditingController _toDatesController = TextEditingController();
-
-
-
-
-
-
   final TextEditingController _textController = TextEditingController();
+  final TextEditingController fixedcontroller = TextEditingController();
+  final TextEditingController bataControllers = TextEditingController();
+
+
+
   List<TextEditingController> additionalTextControllers = [];
 
   final TextEditingController _fromDateController = TextEditingController();
@@ -49,6 +47,9 @@ class _PostdetailpageState extends State<Postdetailpage> {
   final TextEditingController _toTimeController = TextEditingController();
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+
+
 
   DateTime? _selectedDate;
 
@@ -143,11 +144,11 @@ class _PostdetailpageState extends State<Postdetailpage> {
 
   postjobrecords() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var jpId = prefs.getString("user");
+    var jpId = prefs.getString("jpId");
 
     postjob.postjob(
-        postedBy:widget.id,
-        jobType:jobtitlecontroller.text,
+        postedBy:jpId,
+        jobType:selectedJobType,
         jobTitle:jobtitlecontroller.text,
         jobDescription:jobdescontroller.text,
         jobAddress:addresscontroller.text,
@@ -155,12 +156,13 @@ class _PostdetailpageState extends State<Postdetailpage> {
         jobContact:phonecontroller.text,
         location:locationcontroller.text,
         jobFromtime:_fromTimeController.text,
-        jobTotime:_toDateController.text,
+        jobTotime:_toTimeController.text,
         jobFromdate:_fromDateController.text,
         jobTodate:_toDateController.text,
-        jobcateId:jpId,
-        jobBata:_toDatesController.text,
+        jobcateId:widget.id,
+        jobBata: bataControllers.text,
         jobCost:jobcostcontroller.text,
+        jobFixedcost:fixedcontroller.text,
         jobworkingHours:hourscontroller.text,
         jobworkingDays:dayscontroller.text,
         context:context
@@ -184,9 +186,9 @@ class _PostdetailpageState extends State<Postdetailpage> {
     final screenHeight = MediaQuery.of(context).size.height;
 
     // Dispose additional controllers
-    for (var controller in additionalTextControllers) {
-      controller.dispose();
-    }
+    // for (var controller in additionalTextControllers) {
+    //   controller.dispose();
+    // }
 
     // Dynamically generate text fields based on selectedJobType
     List<Widget> additionalTextFields = [];
@@ -202,10 +204,10 @@ class _PostdetailpageState extends State<Postdetailpage> {
             return null;
           },
 
+
+
           keyboardType: TextInputType.number,
-          controller: additionalTextControllers.isEmpty
-              ? TextEditingController()
-              : _toDatesController,
+          controller: fixedcontroller,
           decoration: InputDecoration(
             hintText: 'Enter Amount',
             hintStyle: GoogleFonts.commissioner(
@@ -246,9 +248,10 @@ class _PostdetailpageState extends State<Postdetailpage> {
                   return null;
                 },
                 keyboardType: TextInputType.number,
-                controller: additionalTextControllers.length <= 1
-                    ? TextEditingController()
-                    : additionalTextControllers[1],
+                // controller: additionalTextControllers.length <= 1
+                //     ? bataControllers
+                //     : additionalTextControllers[1],
+                controller: bataControllers,
                 decoration: InputDecoration(
                   hintText: 'Enter Batta Amount',
                   hintStyle: GoogleFonts.commissioner(

@@ -92,6 +92,7 @@ class PostJobdetails {
     required  jobcateId,
     required String jobBata,
     required String jobCost,
+    required String jobFixedcost,
     required String jobworkingHours,
     required String jobworkingDays,
     required context,
@@ -117,9 +118,29 @@ class PostJobdetails {
       'jobcateId':jobcateId,
       'jobBata':jobBata,
       'jobCost':jobCost,
+      'jobFixedcost':jobFixedcost,
       'jobworkingHours':jobworkingHours,
       'jobworkingDays':jobworkingDays
     });
+
+    print(postedBy);
+    print(jobType);
+    print(jobTitle);
+    print(jobDescription);
+    print(jobAddress);
+    print(jobImage);
+    print(jobContact);
+    print(location);
+    print(jobFromtime);
+    print(jobTotime);
+    print(jobFromdate);
+    print(jobTodate);
+    print(jobBata);
+    print(jobCost);
+    print(jobcateId);
+    print(jobFixedcost);
+    print(jobworkingHours);
+    print(jobworkingDays);
 
     Dio dio = Dio();
     Response response = await dio.post(

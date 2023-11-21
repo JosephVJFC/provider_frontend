@@ -38,6 +38,7 @@ class PostJob {
   final String jobCost;
   final String jobworkingHours;
   final String jobworkingDays;
+  final String jobFixedcost;
 
   PostJob({
     required this.postedBy,
@@ -55,6 +56,8 @@ class PostJob {
     required this.jobcateId,
     required this.jobBata,
     required this.jobCost,
+    required this.jobFixedcost,
+
     required this.jobworkingHours,
     required this.jobworkingDays,
   });
@@ -68,6 +71,7 @@ class PostJob {
       'jobAddress':jobAddress,
       'jobImage':jobImage,
       'jobContact':jobContact,
+      'jobFixedcost':jobFixedcost,
       'location':location,
       'jobFromtime':jobFromtime,
       'jobTotime':jobTotime,
