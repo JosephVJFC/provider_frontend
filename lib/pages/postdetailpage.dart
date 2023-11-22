@@ -9,6 +9,7 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:image_picker/image_picker.dart';
 // import 'package:mpmprovider/preview.dart';
 import 'package:intl/intl.dart';
+import 'package:provider_frontend/pages/preview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/home_model.dart';
@@ -24,7 +25,6 @@ class Postdetailpage extends StatefulWidget {
 }
 
 class _PostdetailpageState extends State<Postdetailpage> {
-
   TextEditingController jobtitlecontroller = TextEditingController();
   TextEditingController jobdescontroller = TextEditingController();
   TextEditingController hourscontroller = TextEditingController();
@@ -37,8 +37,6 @@ class _PostdetailpageState extends State<Postdetailpage> {
   final TextEditingController fixedcontroller = TextEditingController();
   final TextEditingController bataControllers = TextEditingController();
 
-
-
   List<TextEditingController> additionalTextControllers = [];
 
   final TextEditingController _fromDateController = TextEditingController();
@@ -48,12 +46,10 @@ class _PostdetailpageState extends State<Postdetailpage> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-
-
-
   DateTime? _selectedDate;
 
   String selectedJobType = 'Hourly';
+  String selectedLocation = 'Thiruvanmiyur';
 
   int maxCharacters = 400;
 
@@ -77,8 +73,6 @@ class _PostdetailpageState extends State<Postdetailpage> {
   }
 
   Future<void> _showFromTimePicker() async {
-
-
     TimeOfDay? selectedTime = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
@@ -107,11 +101,16 @@ class _PostdetailpageState extends State<Postdetailpage> {
   }
 
   Future<void> _selectFromDate() async {
+    DateTime now = DateTime.now();
+    DateTime firstDate = DateTime(now.year, now.month, now.day);
+    DateTime lastDate =
+        firstDate.add(const Duration(days: 30 * 3)); // Add 3 months
+
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2015, 8),
-      lastDate: DateTime(2101),
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
 
     if (picked != null && picked != _selectedDate) {
@@ -124,11 +123,16 @@ class _PostdetailpageState extends State<Postdetailpage> {
   }
 
   Future<void> _selectToDate() async {
+    DateTime now = DateTime.now();
+    DateTime firstDate = DateTime(now.year, now.month, now.day);
+    DateTime lastDate =
+        firstDate.add(const Duration(days: 30 * 3)); // Add 3 months
+
     DateTime? picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
-      firstDate: DateTime(2015, 8),
-      lastDate: DateTime(2101),
+      firstDate: firstDate,
+      lastDate: lastDate,
     );
 
     if (picked != null && picked != _selectedDate) {
@@ -147,38 +151,26 @@ class _PostdetailpageState extends State<Postdetailpage> {
     var jpId = prefs.getString("jpId");
 
     postjob.postjob(
-        postedBy:jpId,
-        jobType:selectedJobType,
-        jobTitle:jobtitlecontroller.text,
-        jobDescription:jobdescontroller.text,
-        jobAddress:addresscontroller.text,
-        jobImage:_selectedImage,
-        jobContact:phonecontroller.text,
-        location:locationcontroller.text,
-        jobFromtime:_fromTimeController.text,
-        jobTotime:_toTimeController.text,
-        jobFromdate:_fromDateController.text,
-        jobTodate:_toDateController.text,
-        jobcateId:widget.id,
+        postedBy: jpId,
+        jobType: selectedJobType,
+        jobTitle: jobtitlecontroller.text,
+        jobDescription: jobdescontroller.text,
+        jobAddress: addresscontroller.text,
+        jobImage: _selectedImage,
+        jobContact: phonecontroller.text,
+        location: locationcontroller.text,
+        jobFromtime: _fromTimeController.text,
+        jobTotime: _toTimeController.text,
+        jobFromdate: _fromDateController.text,
+        jobTodate: _toDateController.text,
+        jobcateId: widget.id,
         jobBata: bataControllers.text,
-        jobCost:jobcostcontroller.text,
-        jobFixedcost:fixedcontroller.text,
-        jobworkingHours:hourscontroller.text,
-        jobworkingDays:dayscontroller.text,
-        context:context
-        );
+        jobCost: jobcostcontroller.text,
+        jobFixedcost: fixedcontroller.text,
+        jobworkingHours: hourscontroller.text,
+        jobworkingDays: dayscontroller.text,
+        context: context);
   }
-
-
-
-
-
-
-
-
-
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -203,9 +195,6 @@ class _PostdetailpageState extends State<Postdetailpage> {
             }
             return null;
           },
-
-
-
           keyboardType: TextInputType.number,
           controller: fixedcontroller,
           decoration: InputDecoration(
@@ -327,7 +316,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                         },
                         controller: jobtitlecontroller,
                         decoration: InputDecoration(
-                          hintText: 'Job title',
+                          hintText: 'Job title*',
                           hintStyle: GoogleFonts.commissioner(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -468,7 +457,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                           controller: selectedJobType == 'Hourly'
                               ? hourscontroller
                               : dayscontroller,
-                                  decoration: InputDecoration(
+                          decoration: InputDecoration(
                             hintText: selectedJobType == 'Hourly'
                                 ? 'How Many Hours works'
                                 : 'How Many Days works',
@@ -493,21 +482,23 @@ class _PostdetailpageState extends State<Postdetailpage> {
                             ),
                           ),
                         ),
-                      },
-                      const SizedBox(height: 10),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Text(
-                            selectedJobType == 'Hourly' ? 'eg.1hr' : 'eg.1 day',
-                            style: GoogleFonts.commissioner(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w500,
-                              color: const Color.fromRGBO(157, 118, 193, 1),
+                        const SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Text(
+                              selectedJobType == 'Hourly'
+                                  ? 'eg.1hr'
+                                  : 'eg.1 day',
+                              style: GoogleFonts.commissioner(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w500,
+                                color: const Color.fromRGBO(157, 118, 193, 1),
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
+                      },
 
                       const SizedBox(
                         height: 25,
@@ -551,7 +542,10 @@ class _PostdetailpageState extends State<Postdetailpage> {
                                   ),
                                 ),
                                 suffixIcon: IconButton(
-                                  icon: const Icon(Icons.calendar_today,size: 18,),
+                                  icon: const Icon(
+                                    Icons.calendar_today,
+                                    size: 18,
+                                  ),
                                   color: Colors.black,
                                   onPressed: _selectFromDate,
                                 ),
@@ -596,7 +590,10 @@ class _PostdetailpageState extends State<Postdetailpage> {
                                   ),
                                 ),
                                 suffixIcon: IconButton(
-                                  icon: const Icon(Icons.calendar_today,size: 18,),
+                                  icon: const Icon(
+                                    Icons.calendar_today,
+                                    size: 18,
+                                  ),
                                   color: Colors.black,
                                   onPressed: _selectToDate,
                                 ),
@@ -648,7 +645,10 @@ class _PostdetailpageState extends State<Postdetailpage> {
                                   ),
                                 ),
                                 suffixIcon: IconButton(
-                                  icon: const Icon(Icons.timer,size: 18,),
+                                  icon: const Icon(
+                                    Icons.timer,
+                                    size: 18,
+                                  ),
                                   color: Colors.black,
                                   onPressed: _showFromTimePicker,
                                 ),
@@ -695,7 +695,10 @@ class _PostdetailpageState extends State<Postdetailpage> {
                                   ),
                                 ),
                                 suffixIcon: IconButton(
-                                  icon: const Icon(Icons.lock_clock_rounded,size: 20,),
+                                  icon: const Icon(
+                                    Icons.lock_clock_rounded,
+                                    size: 20,
+                                  ),
                                   color: Colors.black,
                                   onPressed: _showToTimePicker,
                                 ),
@@ -710,42 +713,43 @@ class _PostdetailpageState extends State<Postdetailpage> {
 
                       ///////////////////////////////////////
 
-                      TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'This field is required';
-                          }
-                          return null;
-                        },
-                        controller: jobcostcontroller,
-                        keyboardType: TextInputType.number,
-                        decoration: InputDecoration(
-                          hintText: 'Cost',
-                          hintStyle: GoogleFonts.commissioner(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                            color: const Color.fromRGBO(217, 217, 217, 1),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              vertical: 5.0, horizontal: 10.0),
-                          focusedBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2.5,
+                      if (selectedJobType != 'Fixed Cost' &&
+                          selectedJobType != 'Fixed Cost + Bata') ...{
+                        TextFormField(
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'This field is required';
+                            }
+                            return null;
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            hintText: 'Cost',
+                            hintStyle: GoogleFonts.commissioner(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                              color: const Color.fromRGBO(217, 217, 217, 1),
                             ),
-                          ),
-                          enabledBorder: const UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(157, 118, 193, 1),
-                              width: 2,
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 5.0, horizontal: 10.0),
+                            focusedBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2.5,
+                              ),
+                            ),
+                            enabledBorder: const UnderlineInputBorder(
+                              borderSide: BorderSide(
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                                width: 2,
+                              ),
                             ),
                           ),
                         ),
-                      ),
-
-                      const SizedBox(
-                        height: 25,
-                      ),
+                        const SizedBox(
+                          height: 25,
+                        ),
+                      },
 
                       TextFormField(
                         validator: (value) {
@@ -820,14 +824,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                         height: 25,
                       ),
                       TextFormField(
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'This field is required';
-                          }
-                          return null;
-                        },
-                        controller:locationcontroller,
-
+                        readOnly: true,
                         decoration: InputDecoration(
                           hintText: 'Location',
                           hintStyle: GoogleFonts.commissioner(
@@ -847,9 +844,39 @@ class _PostdetailpageState extends State<Postdetailpage> {
                                 color: Color.fromRGBO(157, 118, 193, 1),
                                 width: 2),
                           ),
-                          suffixIcon: const Icon(
-                            Icons.arrow_drop_down,
-                            color: Color.fromRGBO(157, 118, 193, 1),
+                          suffixIcon: DropdownButtonHideUnderline(
+                            child: DropdownButton<String>(
+                              value: selectedLocation,
+                              icon: const Icon(
+                                Icons.arrow_drop_down,
+                                color: Color.fromRGBO(157, 118, 193, 1),
+                              ),
+                              iconSize: 24,
+                              elevation: 16,
+                              style: GoogleFonts.commissioner(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.black,
+                              ),
+                              onChanged: (String? newValue) {
+                                if (newValue != null) {
+                                  setState(() {
+                                    selectedLocation = newValue;
+                                  });
+                                }
+                              },
+                              items: <String>[
+                                'Thiruvanmiyur',
+                                'Velachery',
+                                'Guindy',
+                                'Pallikarani',
+                              ].map<DropdownMenuItem<String>>((String value) {
+                                return DropdownMenuItem<String>(
+                                  value: value,
+                                  child: Text(value),
+                                );
+                              }).toList(),
+                            ),
                           ),
                         ),
                       ),
@@ -880,35 +907,35 @@ class _PostdetailpageState extends State<Postdetailpage> {
                               height: 160,
                               child: _selectedImage != null
                                   ? ClipRRect(
-                                borderRadius: BorderRadius.circular(10),
-                                child: Image.file(
-                                  _selectedImage!,
-                                  width: 80, // Adjust the width as needed
-                                  height:
-                                  70, // Adjust the height as needed
-                                ),
-                              )
+                                      borderRadius: BorderRadius.circular(10),
+                                      child: Image.file(
+                                        _selectedImage!,
+                                        width: 80, // Adjust the width as needed
+                                        height:
+                                            70, // Adjust the height as needed
+                                      ),
+                                    )
                                   : Column(
-                                mainAxisAlignment:
-                                MainAxisAlignment.center,
-                                children: [
-                                  const Icon(
-                                    Icons.image_outlined,
-                                    color:
-                                    Color.fromRGBO(157, 118, 193, 1),
-                                    size: 35,
-                                  ),
-                                  Text(
-                                    'Upload photos',
-                                    style: GoogleFonts.commissioner(
-                                      fontWeight: FontWeight.w400,
-                                      fontSize: 10,
-                                      color: const Color.fromRGBO(
-                                          157, 118, 193, 1),
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        const Icon(
+                                          Icons.image_outlined,
+                                          color:
+                                              Color.fromRGBO(157, 118, 193, 1),
+                                          size: 35,
+                                        ),
+                                        Text(
+                                          'Upload photos',
+                                          style: GoogleFonts.commissioner(
+                                            fontWeight: FontWeight.w400,
+                                            fontSize: 10,
+                                            color: const Color.fromRGBO(
+                                                157, 118, 193, 1),
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                  ),
-                                ],
-                              ),
                             ),
                           ),
                           Positioned(
@@ -916,16 +943,16 @@ class _PostdetailpageState extends State<Postdetailpage> {
                             right: 5,
                             child: _selectedImage != null
                                 ? InkWell(
-                              onTap: () {
-                                setState(() {
-                                  _selectedImage = null;
-                                });
-                              },
-                              child: const Icon(
-                                Icons.cancel,
-                                color: Colors.red,
-                              ),
-                            )
+                                    onTap: () {
+                                      setState(() {
+                                        _selectedImage = null;
+                                      });
+                                    },
+                                    child: const Icon(
+                                      Icons.cancel,
+                                      color: Colors.red,
+                                    ),
+                                  )
                                 : const SizedBox(),
                           ),
                         ],
@@ -943,13 +970,19 @@ class _PostdetailpageState extends State<Postdetailpage> {
                       ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          postjobrecords();
-                          // Navigator.push(
-                          //   context,
-                          //   MaterialPageRoute(
-                          //     builder: (context) => const Preview(),
-                          //   ),
-                          // );
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => Preview(
+                                jobTitle: jobtitlecontroller.text,
+                                jobType: selectedJobType,
+                                number: phonecontroller.text,
+                                address: addresscontroller.text,
+                                location: locationcontroller.text,
+                                description: jobdescontroller.text,
+                              ),
+                            ),
+                          );
                         }
                       },
                       child: Text(
