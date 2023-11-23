@@ -12,7 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:provider_frontend/pages/preview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import '../model/home_model.dart';
+// import '../model/home_model.dart';
 import '../service/home_service.dart';
 
 class Postdetailpage extends StatefulWidget {
@@ -33,7 +33,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
   TextEditingController phonecontroller = TextEditingController();
   TextEditingController locationcontroller = TextEditingController();
   TextEditingController addresscontroller = TextEditingController();
-  final TextEditingController _textController = TextEditingController();
+
   final TextEditingController fixedcontroller = TextEditingController();
   final TextEditingController bataControllers = TextEditingController();
 
@@ -54,24 +54,24 @@ class _PostdetailpageState extends State<Postdetailpage> {
   int maxCharacters = 400;
 
   File? _selectedImage;
-
+/////////////////////PUSH
   @override
   void initState() {
     super.initState();
-    _textController.addListener(_updateCharacterCount);
+    jobdescontroller.addListener(_updateCharacterCount);
   }
 
   @override
   void dispose() {
-    _textController.removeListener(_updateCharacterCount);
-    _textController.dispose();
+    jobdescontroller.removeListener(_updateCharacterCount);
+    jobdescontroller.dispose();
     super.dispose();
   }
 
   void _updateCharacterCount() {
     setState(() {});
   }
-
+/////////////////////PUSH
   Future<void> _showFromTimePicker() async {
     TimeOfDay? selectedTime = await showTimePicker(
       context: context,
@@ -100,6 +100,8 @@ class _PostdetailpageState extends State<Postdetailpage> {
     }
   }
 
+
+///////////////////////PUSH
   Future<void> _selectFromDate() async {
     DateTime now = DateTime.now();
     DateTime firstDate = DateTime(now.year, now.month, now.day);
@@ -113,7 +115,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
       lastDate: lastDate,
     );
 
-    if (picked != null && picked != _selectedDate) {
+    if (picked != null) {
       setState(() {
         _selectedDate = picked;
         String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
@@ -135,15 +137,27 @@ class _PostdetailpageState extends State<Postdetailpage> {
       lastDate: lastDate,
     );
 
-    if (picked != null && picked != _selectedDate) {
-      setState(() {
-        _selectedDate = picked;
-        String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
-        _toDateController.text = formattedDate;
-      });
+    if (picked != null) {
+      if (_selectedDate == null ||
+          picked.isAfter(_selectedDate!) ||
+          picked.isAtSameMomentAs(_selectedDate!)) {
+        setState(() {
+          _selectedDate = picked;
+          String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
+          _toDateController.text = formattedDate;
+        });
+      } else {
+        // Display a message to the user
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+                'The "to date" must be after or equal to the "from date".'),
+          ),
+        );
+      }
     }
   }
-
+/////////////////////////////////push
   PostJobdetails postjob = PostJobdetails();
 
   postjobrecords() async {
@@ -337,6 +351,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                         ),
                       ),
                       const SizedBox(height: 25),
+                      /////////////////////PUSH
                       TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -358,13 +373,15 @@ class _PostdetailpageState extends State<Postdetailpage> {
                           ),
                           focusedBorder: const UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(157, 118, 193, 1),
-                                width: 2.5),
+                              color: Color.fromRGBO(157, 118, 193, 1),
+                              width: 2.5,
+                            ),
                           ),
                           enabledBorder: const UnderlineInputBorder(
                             borderSide: BorderSide(
-                                color: Color.fromRGBO(157, 118, 193, 1),
-                                width: 2),
+                              color: Color.fromRGBO(157, 118, 193, 1),
+                              width: 2,
+                            ),
                           ),
                         ),
                       ),
@@ -372,17 +389,19 @@ class _PostdetailpageState extends State<Postdetailpage> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Text(
-                            '${_textController.text.length}/$maxCharacters',
+                            '${jobdescontroller.text.length}/$maxCharacters',
                             style: GoogleFonts.commissioner(
                               fontSize: 9,
                               fontWeight: FontWeight.w500,
-                              color: _textController.text.length > maxCharacters
-                                  ? Colors.red
-                                  : Colors.black,
+                              color:
+                                  jobdescontroller.text.length > maxCharacters
+                                      ? Colors.red
+                                      : Colors.black,
                             ),
                           ),
                         ],
                       ),
+                      /////////////////////PUSH
                       const SizedBox(height: 18),
                       TextFormField(
                         readOnly: true,
@@ -957,9 +976,9 @@ class _PostdetailpageState extends State<Postdetailpage> {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
+                     ),
+                     const SizedBox(height: 30),
+                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 50.0, vertical: 8.0),
