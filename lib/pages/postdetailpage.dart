@@ -54,7 +54,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
   int maxCharacters = 400;
 
   File? _selectedImage;
-/////////////////////PUSH
+
   @override
   void initState() {
     super.initState();
@@ -71,7 +71,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
   void _updateCharacterCount() {
     setState(() {});
   }
-/////////////////////PUSH
+
   Future<void> _showFromTimePicker() async {
     TimeOfDay? selectedTime = await showTimePicker(
       context: context,
@@ -100,8 +100,6 @@ class _PostdetailpageState extends State<Postdetailpage> {
     }
   }
 
-
-///////////////////////PUSH
   Future<void> _selectFromDate() async {
     DateTime now = DateTime.now();
     DateTime firstDate = DateTime(now.year, now.month, now.day);
@@ -157,6 +155,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
       }
     }
   }
+
 /////////////////////////////////push
   PostJobdetails postjob = PostJobdetails();
 
@@ -976,9 +975,9 @@ class _PostdetailpageState extends State<Postdetailpage> {
                           ),
                         ],
                       ),
-                     ),
-                     const SizedBox(height: 30),
-                     ElevatedButton(
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 50.0, vertical: 8.0),
@@ -1042,6 +1041,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
+                      Navigator.pop(context);
                       _pickImage(ImageSource.gallery);
                     },
                     child: const SizedBox(
@@ -1061,6 +1061,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
+                      Navigator.pop(context);
                       _pickImage(ImageSource.camera);
                     },
                     child: const SizedBox(
