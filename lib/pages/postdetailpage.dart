@@ -1,18 +1,19 @@
 // ignore_for_file: unused_local_variable, equal_elements_in_set
 
+import 'dart:developer';
 import 'dart:io';
-
+import 'package:custom_searchable_dropdown/custom_searchable_dropdown.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:dotted_border/dotted_border.dart';
 import 'package:image_picker/image_picker.dart';
-// import 'package:mpmprovider/preview.dart';
+
 import 'package:intl/intl.dart';
 import 'package:provider_frontend/pages/preview.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-// import '../model/home_model.dart';
 import '../service/home_service.dart';
 
 class Postdetailpage extends StatefulWidget {
@@ -31,7 +32,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
   TextEditingController dayscontroller = TextEditingController();
   TextEditingController jobcostcontroller = TextEditingController();
   TextEditingController phonecontroller = TextEditingController();
-  TextEditingController locationcontroller = TextEditingController();
+  // TextEditingController selectedDropdownValue = TextEditingController();
   TextEditingController addresscontroller = TextEditingController();
 
   final TextEditingController fixedcontroller = TextEditingController();
@@ -49,7 +50,9 @@ class _PostdetailpageState extends State<Postdetailpage> {
   DateTime? _selectedDate;
 
   String selectedJobType = 'Hourly';
-  String selectedLocation = 'Thiruvanmiyur';
+
+
+  // String selectedLocation = ;
 
   int maxCharacters = 400;
 
@@ -57,6 +60,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
 
   @override
   void initState() {
+    fetchdistrictname();
     super.initState();
     jobdescontroller.addListener(_updateCharacterCount);
   }
@@ -100,6 +104,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
     }
   }
 
+
   Future<void> _selectFromDate() async {
     DateTime now = DateTime.now();
     DateTime firstDate = DateTime(now.year, now.month, now.day);
@@ -116,7 +121,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
     if (picked != null) {
       setState(() {
         _selectedDate = picked;
-        String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
+        String formattedDate = DateFormat('yyyy-MM-dd').format(picked);
         _fromDateController.text = formattedDate;
       });
     }
@@ -141,7 +146,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
           picked.isAtSameMomentAs(_selectedDate!)) {
         setState(() {
           _selectedDate = picked;
-          String formattedDate = DateFormat('dd-MM-yyyy').format(picked);
+          String formattedDate = DateFormat('yyyy-MM-dd').format(picked);
           _toDateController.text = formattedDate;
         });
       } else {
@@ -156,7 +161,36 @@ class _PostdetailpageState extends State<Postdetailpage> {
     }
   }
 
-/////////////////////////////////push
+
+  List<String> districtListforDropdown = [];
+  String? selectedDropdownValue;
+  Future<void> fetchdistrictname() async {
+    try {
+      List<String> districtList = await ApiService().fetchdistrictnames();
+      setState(() {
+        districtListforDropdown = districtList;
+      });
+    } catch (e) {
+      print('Error fetching : $e');
+    }
+  }
+
+  List<dynamic> _buildDropdownMenuItemsforDistrictName() {
+      return districtListforDropdown.map((districtName) {
+        return DropdownMenuItem<String>(
+          value: districtName, // Assuming the districtName object has a 'name' property
+          child: Text(districtName), // Replace 'name' with the property that contains the country name
+        );
+      }).toList();
+  }
+
+
+
+
+
+
+
+
   PostJobdetails postjob = PostJobdetails();
 
   postjobrecords() async {
@@ -171,7 +205,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
         jobAddress: addresscontroller.text,
         jobImage: _selectedImage,
         jobContact: phonecontroller.text,
-        location: locationcontroller.text,
+        location: selectedDropdownValue.toString(),
         jobFromtime: _fromTimeController.text,
         jobTotime: _toTimeController.text,
         jobFromdate: _fromDateController.text,
@@ -350,7 +384,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                         ),
                       ),
                       const SizedBox(height: 25),
-                      /////////////////////PUSH
+
                       TextFormField(
                         validator: (value) {
                           if (value == null || value.isEmpty) {
@@ -400,7 +434,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                           ),
                         ],
                       ),
-                      /////////////////////PUSH
+
                       const SizedBox(height: 18),
                       TextFormField(
                         readOnly: true,
@@ -740,6 +774,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
                             }
                             return null;
                           },
+                          controller: jobcostcontroller,
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             hintText: 'Cost',
@@ -844,7 +879,6 @@ class _PostdetailpageState extends State<Postdetailpage> {
                       TextFormField(
                         readOnly: true,
                         decoration: InputDecoration(
-                          hintText: 'Location',
                           hintStyle: GoogleFonts.commissioner(
                             fontSize: 14,
                             fontWeight: FontWeight.w500,
@@ -862,48 +896,40 @@ class _PostdetailpageState extends State<Postdetailpage> {
                                 color: Color.fromRGBO(157, 118, 193, 1),
                                 width: 2),
                           ),
-                          suffixIcon: DropdownButtonHideUnderline(
-                            child: DropdownButton<String>(
-                              value: selectedLocation,
-                              icon: const Icon(
-                                Icons.arrow_drop_down,
-                                color: Color.fromRGBO(157, 118, 193, 1),
-                              ),
-                              iconSize: 24,
-                              elevation: 16,
-                              style: GoogleFonts.commissioner(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.black,
-                              ),
-                              onChanged: (String? newValue) {
-                                if (newValue != null) {
-                                  setState(() {
-                                    selectedLocation = newValue;
-                                  });
-                                }
-                              },
-                              items: <String>[
-                                'Thiruvanmiyur',
-                                'Velachery',
-                                'Guindy',
-                                'Pallikarani',
-                              ].map<DropdownMenuItem<String>>((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value),
-                                );
-                              }).toList(),
-                            ),
+                          suffixIcon: CustomSearchableDropDown(
+                            items: districtListforDropdown,
+                            label: 'Select Location',
+                            showClearButton: true,
+
+                            dropDownMenuItems: districtListforDropdown,
+                            onChanged: (value){
+                              if(value!=null) {
+                                setState(() {
+                                  selectedDropdownValue = value!;
+                                  print(
+                                      "Selected  serve categoryValue: $selectedDropdownValue");
+                                });
+                              }
+                            },
                           ),
                         ),
                       ),
+
+
+
+
+
+
                     ],
                   ),
                 ),
+
+
+
+                
+
                 const SizedBox(height: 60),
 
-                // ///////////////////////////////////////////////////////////////////////////
 
                 Column(
                   children: [
@@ -975,9 +1001,9 @@ class _PostdetailpageState extends State<Postdetailpage> {
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 30),
-                    ElevatedButton(
+                     ),
+                     const SizedBox(height: 30),
+                     ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 50.0, vertical: 8.0),
@@ -988,19 +1014,20 @@ class _PostdetailpageState extends State<Postdetailpage> {
                       ),
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => Preview(
-                                jobTitle: jobtitlecontroller.text,
-                                jobType: selectedJobType,
-                                number: phonecontroller.text,
-                                address: addresscontroller.text,
-                                location: locationcontroller.text,
-                                description: jobdescontroller.text,
-                              ),
-                            ),
-                          );
+                          postjobrecords();
+                          // Navigator.push(
+                          //   context,
+                          //   MaterialPageRoute(
+                          //     builder: (context) => Preview(
+                          //       jobTitle: jobtitlecontroller.text,
+                          //       jobType: selectedJobType,
+                          //       number: phonecontroller.text,
+                          //       address: addresscontroller.text,
+                          //       location: selectedDropdownValue.toString(),
+                          //       description: jobdescontroller.text,
+                          //     ),
+                          //   ),
+                          // );
                         }
                       },
                       child: Text(
@@ -1041,7 +1068,6 @@ class _PostdetailpageState extends State<Postdetailpage> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      Navigator.pop(context);
                       _pickImage(ImageSource.gallery);
                     },
                     child: const SizedBox(
@@ -1061,7 +1087,6 @@ class _PostdetailpageState extends State<Postdetailpage> {
                 Expanded(
                   child: InkWell(
                     onTap: () {
-                      Navigator.pop(context);
                       _pickImage(ImageSource.camera);
                     },
                     child: const SizedBox(

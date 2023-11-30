@@ -52,6 +52,8 @@ dependencies:
   dotted_border: ^2.1.0
   skeletonizer: ^0.8.0
   auto_size_text: ^3.0.0
+  dropdown_search: ^5.0.6
+  custom_searchable_dropdown: ^2.1.1
 
 dev_dependencies:
   flutter_test:

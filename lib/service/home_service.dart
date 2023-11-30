@@ -28,7 +28,6 @@ class GetCategory
     );
 
     if (response.statusCode == 200) {
-      log(":::::::::::::::::::::::::::::::::::::::::::::::::::${response.statusCode}");
 
       print(response.data);
       // Handle a successful response
@@ -73,7 +72,6 @@ class GetCategory
     return dataList;
   }
 }
-
 
 class PostJobdetails {
   Future<void>  postjob({
@@ -160,56 +158,11 @@ class PostJobdetails {
       if (response.data['status'] == "1") {
         print('API response: ${response.data}');
         var message = response.data['response'];
-        // var itemData = message['categories'];
-        // for (var itemData in categoryDetails) {
-          // Process each item and add it to the dataList
-          // String postedBy = itemData['postedBy'].toString();
-          // String jobTitle = itemData['jobTitle'].toString();
-          // String jobType = itemData['jobType'].toString();
-          // String jobDescription = itemData['jobDescription'].toString();
-          // String jobAddress = itemData['jobAddress'].toString();
-          // String jobImage = itemData['jobImage'].toString();
-          // String jobContact = itemData['jobContact'].toString();
-          // String location = itemData['location'].toString();
-          // String jobFromtime = itemData['jobFromtime'].toString();
-          // String jobTotime = itemData['jobTotime'].toString();
-          // String jobFromdate = itemData['jobFromdate'].toString();
-          // String jobTodate = itemData['jobTodate'].toString();
-          // String jobcateId = itemData['jobcateId'].toString();
-          // String jobBata = itemData['jobBata'].toString();
-          // String jobCost = itemData['jobCost'].toString();
-          // String jobworkingHours = itemData['jobworkingHours'].toString();
-          // String jobworkingDays = itemData['jobworkingDays'].toString();
 
-          // // Create a Category object and add it to the dataList
-          // postdetails.add(
-          //   PostJob(
-          //       postedBy:postedBy,
-          //       jobType:jobType,
-          //       jobTitle:jobTitle,
-          //       jobDescription:jobDescription,
-          //       jobAddress:jobAddress,
-          //       jobImage:jobImage,
-          //       jobContact:jobContact,
-          //       location:location,
-          //       jobFromtime:jobFromtime,
-          //       jobTotime:jobTotime,
-          //       jobFromdate:jobFromdate,
-          //       jobTodate:jobTodate,
-          //       jobcateId:jobcateId,
-          //       jobBata:jobBata,
-          //       jobCost:jobCost,
-          //       jobworkingHours:jobworkingHours,
-          //       jobworkingDays:jobworkingDays
-          //
-          //   ),
-          //
-          // );
-        // }
-        showCustomSnackBar(
-          context: context,
-          text: message.toString(),
-        );
+        // showCustomSnackBar(
+        //   context: context,
+        //   text: message.toString(),
+        // );
 
       } else {
         showCustomSnackBar(
@@ -222,5 +175,44 @@ class PostJobdetails {
       print('API request failed with status code ${response.statusCode}');
     }
     // return postdetails;
+  }
+}
+
+class ApiService {
+  Future<List<String>> fetchdistrictnames() async {
+    final String apiUrl = '$JbaseUrl/api/alldistrict';
+    print(apiUrl);
+List<String>districtList =[];
+    try {
+      Dio dio = Dio();
+      Response response = await dio.get(
+        apiUrl,
+      );
+      if (response.statusCode == 200) {
+        if (response.data['status'] == "1") {
+
+
+          var data = response.data['response']['locationdata'];
+          // log(response.body);
+          for ( var itemlist in data) {
+            String districtName = itemlist['districtName'];
+            districtList.add(districtName);
+          }
+          return districtList;
+
+
+
+        }else {
+          throw Exception('NoData available');
+      }
+      } else {
+        throw Exception(
+            'Failed to load data from the API. Status Code: ${response
+                .statusCode}');
+      }
+    } catch (e) {
+      log('Error fetching data: $e');
+      throw Exception('An error occurred while fetching data from the API.');
+    }
   }
 }
