@@ -1,6 +1,7 @@
 import 'dart:developer';
 
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import '../constants/globalvariable.dart';
 import '../constants/headers.dart';
 import '../constants/utilities.dart';
@@ -80,7 +81,7 @@ class PostJobdetails {
     required String jobTitle,
     required String jobDescription,
     required String jobAddress,
-    required  jobImage,
+    required  XFile ? jobImage,
     required String jobContact,
     required String location,
     required String jobFromtime,
@@ -98,7 +99,8 @@ class PostJobdetails {
 
     // Define the URL of your API endpoint
     final String apiUrl = '$JbaseUrl/api/jp/jobpost';
-
+    String fileName = jobImage!.path.split('/').last;
+    print(fileName);
 
     FormData formData = FormData.fromMap({
       'postedBy':postedBy,
@@ -106,7 +108,7 @@ class PostJobdetails {
       'jobTitle':jobTitle,
       'jobDescription':jobDescription,
       'jobAddress':jobAddress,
-      'jobImage':jobImage,
+      'jobImage':await MultipartFile.fromFile(jobImage.path,),
       'jobContact':jobContact,
       'location':location,
       'jobFromtime':jobFromtime,

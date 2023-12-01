@@ -56,7 +56,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
 
   int maxCharacters = 400;
 
-  File? _selectedImage;
+  XFile? _selectedImage;
 
   @override
   void initState() {
@@ -952,11 +952,23 @@ class _PostdetailpageState extends State<Postdetailpage> {
                               child: _selectedImage != null
                                   ? ClipRRect(
                                       borderRadius: BorderRadius.circular(10),
-                                      child: Image.file(
-                                        _selectedImage!,
-                                        width: 80, // Adjust the width as needed
-                                        height:
-                                            70, // Adjust the height as needed
+
+
+                                      child:
+                                      Container(
+                                          width: 80, // Adjust the width as needed
+                                          height:
+                                              70,
+                                        decoration:BoxDecoration(
+                                         image: DecorationImage(image: FileImage(File(_selectedImage!.path))
+                                          )
+                                        ) ,
+                                        // child: Image.file(
+                                        //   _selectedImage!,
+                                        //   width: 80, // Adjust the width as needed
+                                        //   height:
+                                        //       70, // Adjust the height as needed
+                                        // ),
                                       ),
                                     )
                                   : Column(
@@ -1120,7 +1132,7 @@ class _PostdetailpageState extends State<Postdetailpage> {
 
     if (pickedImage != null) {
       setState(() {
-        _selectedImage = File(pickedImage.path);
+        _selectedImage =pickedImage;
       });
     }
   }
